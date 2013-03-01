@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- <script type="text/javascript" src="/static/jscript/jquery-latest.js"></script>
+<script type="text/javascript" src="/static/jscript/jquery.tablesorter.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function()
+	{
+		$("#Teams").tablesorter( {sortList: [[0,0], [1,0]]} );
+	}
+);</script> -->
+<h1>Spirit scores of game {{game.id}}</h1>
+
+<p><div>
+{% for key,val in game.iteritems %}
+	{{key}}: {{val}}<br>
+{% endfor %}
+</div>
+
+<h2>Spirit</h2>
+{% for s in spirit %}
+{% for key,val in s.iteritems %}
+	{{key}}: {{val}}<br>
+{% endfor %}
+{% endfor %}
+
+
+{% endblock content %}

@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Spirit score entry for game {{game.id}}</h1>
+Teams: {{game.team_1.name}} - {{game.team_2.name}}<br>
+Score: {{game.team_1_score}} - {{game.team_2_score}}<br>
+Time: {{game.start_time}}<br>
+Tournament: {{game.tournament.name}}<br>
+Season: {{game.season.name}}<br>
+League: {{game.season.league.name}}<br>
+<br>
+Team giving spirit: {{team_giving_name}}<br>
+Team receiving spirit: {{team_receiving_name}}<br>
+
+<form action="/game/{{game.id}}/submit/{{team_giving}}/" method="post">{% csrf_token %}
+{{ form.as_p }}
+<input type="submit" value="Submit" />
+</form>
+
+
+<img src="/static/spirit_form.png"></img>
+
+
+{% endblock content %}

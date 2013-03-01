@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Team page of {{team.name}}</h1>
+
+Welcome {{first_name}}<br>
+<a href="/logout/">logout</a><br><br>
+
+<h2>Previous Games:</h2>
+{% for g in games %}
+<div>Tournament: {{g.tournament.name}}</div>
+<div>Field: {{g.game_site.name}}</div>
+<div>Time: {{g.start_time}}</div>
+<div>Opponent: {{g.opp.name}}</div>
+<div>Result: {{g.score_string}}</div>
+<div>Spirit score you give to {{g.opp.name}}: 
+{% if g.spirit_received %}
+	{{g.spirit_received}}
+{% else %}
+<a href="/game/{{g.id}}">submit spirit score</a>
+{% endif %}</div>
+<div>Spirit score you received from {{g.opp.name}}:
+{% if g.spirit_given %}
+	{{g.spirit_given}}
+{% else %}
+no spirit score yet
+{% endif %}</div>
+<br><br>
+{% endfor %}
+
+<!-- 
+Previous games:
+Field: 5   (link to field map)
+Time: Saturday, 9:00
+Opponent: Freespeed  (with link to their team page)
+Result: W 14 - 12     or     L 5 - 15            or      submit score
+(resulted in increase of your strength by 0.8)   or   (resulted in decrease of your strength by 2.3)
+Spirit score you give to Freespeed:  2 + 2 + 0 + 2 + 1 = 7      or    submit score
+Spirit score you received from Freespeed: 2 + 2 + 2 + 2 + 2 = 10     or   no score yet -->
+
+{% endblock content %}
