@@ -4,8 +4,11 @@ ROOT_PATH = os.path.dirname(__file__)
 
 OFFLINE = False
 
+# allows to switch between the real and the testing leaguevine server
 HOST="http://api.playwithlv.com"
 #HOST="https://api.leaguevine.com"
+
+# expects credentials to be stored in environmental variables!
 
 if HOST=="http://api.playwithlv.com":
     CLIENT_ID = os.environ['CLIENT_ID_PLAYWITHLV']
