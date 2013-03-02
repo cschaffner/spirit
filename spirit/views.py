@@ -152,6 +152,12 @@ def game(request,game_id):
                 break
             
     spirit=api_spiritbygame(game_id)
+    for s in spirit['objects']:
+        if not 'team_1_spirit' in game and s['team_1_score']!='':
+            game['team_1_spirit']=s['team_1_score']
+        if not 'team_2_spirit' in game and s['team_2_score']!='':
+            game['team_2_spirit']=s['team_2_score']
+    
     return render_to_response('game.html', {'game': game, 'spirit': spirit})
 
 def game_submit(request,game_id,team_giving):

@@ -56,8 +56,8 @@ Spirit scores are computed based on {{games|length}} games in this {{type}}.
 	<tr><td>{{g.team_1.name}}</td>
 		<td>{{g.team_1_score}} - {{g.team_2_score}}</td>
 		<td>{{g.team_2.name}}</td>
-		<td><a href="/game/{{g.id}}/2/">{% if g.team_1_spirit %}{{g.team_1_spirit}}{% else %}enter{% endif %}</a></td>
-		<td><a href="/game/{{g.id}}/1/">{% if g.team_2_spirit %}{{g.team_2_spirit}}{% else %}enter{% endif %}</a></td>
+		<td><a href="/game/{{g.id}}/submit/2/">{% if g.team_1_spirit %}{{g.team_1_spirit}}{% else %}enter{% endif %}</a></td>
+		<td><a href="/game/{{g.id}}/submit/1/">{% if g.team_2_spirit %}{{g.team_2_spirit}}{% else %}enter{% endif %}</a></td>
 	</tr>
 	{% endfor %}
 </table>

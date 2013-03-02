@@ -223,13 +223,17 @@ def api_gamesbytournament(tournament_id):
     return response_dict
 
 def api_spiritbytournament(tournament_id):
-    url='{0}/v1/game_sportsmanship_scores/?limit=200&tournament_id={1}'.format(settings.HOST,tournament_id)
+    # the most recent score will be reported first, so we can just go through the list
+    # and the first score with the right properties we encounter will be the most recent one
+    url='{0}/v1/game_sportsmanship_scores/?limit=200&tournament_id={1}&order_by=%5B-time_last_updated%5D'.format(settings.HOST,tournament_id)
     response = requests.get(url=url,headers=my_headers,config=my_config)
     response_dict = simplejson.loads(response.content)
     return response_dict
 
 def api_spiritbygame(game_id):
-    url='{0}/v1/game_sportsmanship_scores/?limit=200&game_ids=%5B{1}%5D'.format(settings.HOST,game_id)
+    # the most recent score will be reported first, so we can just go through the list
+    # and the first score with the right properties we encounter will be the most recent one
+    url='{0}/v1/game_sportsmanship_scores/?limit=200&game_ids=%5B{1}%5D&order_by=%5B-time_last_updated%5D'.format(settings.HOST,game_id)
     response = requests.get(url=url,headers=my_headers,config=my_config)
     response_dict = simplejson.loads(response.content)
     return response_dict

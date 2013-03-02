@@ -15,7 +15,7 @@ urlpatterns = patterns('',
     url(r'^team/(\d+)/$', 'spirit.views.team'),
     url(r'^tournament/(\d+)/$', 'spirit.views.tournament'),
     url(r'^game/(\d+)/$', 'spirit.views.game'),
-    url(r'^game/(\d+)/submit/([1|2])$', 'spirit.views.game_submit'),
+    url(r'^game/(\d+)/submit/([1|2])/$', 'spirit.views.game_submit'),
     
     # url(r'^spirit/', include('spirit.foo.urls')),
 

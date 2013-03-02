@@ -12,17 +12,27 @@ $(document).ready(function()
 );</script> -->
 <h1>Spirit scores of game {{game.id}}</h1>
 
+<div>Team 1: {{game.team_1.name}}</div>
+<div>Team 2: {{game.team_2.name}}</div>
+
+<div>Team 1: Spirit received: {{game.team_1_spirit}}</div>
+<div>Team 2: Spirit received: {{game.team_2_spirit}}</div>
+
+
 <p><div>
 {% for key,val in game.iteritems %}
 	{{key}}: {{val}}<br>
 {% endfor %}
 </div>
 
-<h2>Spirit</h2>
-{% for s in spirit %}
-{% for key,val in s.iteritems %}
-	{{key}}: {{val}}<br>
-{% endfor %}
+<h2>Spirit History</h2>
+{% for s in spirit.objects %}
+<div>
+	<div>created by: {{s.created_by.first_name}} {{s.created_by.last_name}}</div>
+	<div>time: {{s.time_last_updated}}</div>
+	<div>team 1 received: {{s.team_1_score}}</div>
+	<div>team 2 received: {{s.team_2_score}}</div>
+</div>
 {% endfor %}
 
 
