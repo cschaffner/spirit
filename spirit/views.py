@@ -129,9 +129,9 @@ def tournament(request,tournament_id):
     user_id=request.session.get('user_id',None)
     user_first_name=request.session.get('first_name', None)
     user_teamids=request.session.get('user_teamids',None)
-    for g in games:
-        g['team_1_spirit_editable'] = int(g['team_1_id']) in user_teamids
-        g['team_2_spirit_editable'] = int(g['team_2_id']) in user_teamids
+    for g in games['objects']:
+        g['team_1_spirit_editable'] = g['team_2_id'] in user_teamids
+        g['team_2_spirit_editable'] = g['team_1_id'] in user_teamids
 
     # compute spirit score overview
     teams,games_wspirit = TeamsFromGames(spirit['objects'],games['objects'])

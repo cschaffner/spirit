@@ -30,9 +30,9 @@ In order to edit spirit scores, you need to <a href="{{loginurl}}">log in</a>.
 <div>Team 1: {{game.team_1.name}}</div>
 <div>Team 2: {{game.team_2.name}}</div>
 
-<div>Spirit received by Team 1: {{game.team_1_spirit}} 
+<div>Spirit of Team 1: {{game.team_1_spirit}} 
 	{% if game.team_1_spirit_editable %}<a href="/game/{{game.id}}/submit/2/">Edit</a>{% endif %}</div>
-<div>Spirit received by Team 2: {{game.team_2_spirit}} 
+<div>Spirit of Team 2: {{game.team_2_spirit}} 
 	{% if game.team_2_spirit_editable %}<a href="/game/{{game.id}}/submit/1/">Edit</a>{% endif %}</div>
 
 
