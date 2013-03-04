@@ -1,66 +1,12 @@
-{% extends "base.html" %}
+{% extends "overview.html" %}
 
-{% block content %}
-<script type="text/javascript" src="/static/jscript/jquery-latest.js"></script>
-<script type="text/javascript" src="/static/jscript/jquery.tablesorter.js"></script>
+{% block title %}
+<h1>Spirit scores of Tournament {{id}}</h1>
 
-<script type="text/javascript">
-$(document).ready(function()
-	{
-		$("#Teams").tablesorter( {sortList: [[0,0], [1,0]]} );
-	}
-);</script>
+Spirit scores are computed based on {{games|length}} games in this tournament.
 
+<div>League: {{info.season.league.name}}</div>
+<div>Season: <a href="/season/{{info.season_id}}">{{info.season.name}}</a></div>
+<div>Tournament: {{info.name}}</div>
 
-<h1>Spirit scores of {{type}} {{id}}</h1>
-
-Spirit scores are computed based on {{games|length}} games in this {{type}}.
-
-<p><div>
-{% for key,val in info.iteritems %}
-	{{key}}: {{val}}<br>
-{% endfor %}
-</div>
-
-<h2>Teams</h2>
-<table id="Teams" class="tablesorter">
-	<thead>
-	<tr>
-		<th>Teams</th>
-		<th>Avg Rec</th>
-		<th>Avg Rec Tot</th>
-		<th>Nr Rec</th>
-		<th>Avg Given</th>
-		<th>Avg Given Tot</th>
-		<th>Nr Given</th>
-	</tr>
-	</thead>
-	<tbody>
-	{% for id,t in teams.iteritems %}
-	<tr><td>{{t.name}}</td>
-		<td>{{t.avg_received}}</td>
-		<td>{{t.avg_received_total|floatformat}}</td>
-		<td>{{t.nr_received}}</td>
-		<td>{{t.avg_given}}</td>
-		<td>{{t.avg_given_total|floatformat}}</td>
-		<td>{{t.nr_given}}</td>
-	</tr>
-	{% endfor %}
-	</tbody>
-</table>
-
-<h2>Games</h2>
-<table>
-	<tr><td>Team 1</td><td>Score</td><td>Team 2</td><td>Team1 rec</td><td>Team2 rec</td></tr>
-	{% for g in games %}
-	<tr><td>{{g.team_1.name}}</td>
-		<td>{{g.team_1_score}} - {{g.team_2_score}}</td>
-		<td>{{g.team_2.name}}</td>
-		<td><a href="/game/{{g.id}}/submit/2/">{% if g.team_1_spirit %}{{g.team_1_spirit}}{% else %}enter{% endif %}</a></td>
-		<td><a href="/game/{{g.id}}/submit/1/">{% if g.team_2_spirit %}{{g.team_2_spirit}}{% else %}enter{% endif %}</a></td>
-	</tr>
-	{% endfor %}
-</table>
-
-
-{% endblock content %}
+{% endblock title %}

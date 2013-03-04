@@ -20,6 +20,7 @@ else:
     CLIENT_ID = os.environ['CLIENT_ID']
     CLIENT_PWD = os.environ['CLIENT_PWD']
     REDIRECT_URI = 'http://127.0.0.1:8000/code/'
+LOGINURL='{0}/oauth2/authorize/?client_id={1}&response_type=code&redirect_uri={2}&scope=universal'.format(TOKEN_URL,CLIENT_ID,REDIRECT_URI)
 
 
 DEBUG = True

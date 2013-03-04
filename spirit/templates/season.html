@@ -1,0 +1,11 @@
+{% extends "overview.html" %}
+
+{% block title %}
+<h1>Spirit scores of Season {{id}}</h1>
+
+Spirit scores are computed based on {{games|length}} games in this season.
+
+<div>League: {{info.league.name}}</div>
+<div>Season: <a href="/season/{{info.season_id}}">{{info.name}}</a></div>
+
+{% endblock title %}

@@ -2,6 +2,8 @@
 
 {% block content %}
 <h1>Spirit score entry for game {{game.id}}</h1>
+
+<div>Back to <a href="/game/{{game.id}}/">game</a></div>
 Teams: {{game.team_1.name}} - {{game.team_2.name}}<br>
 Score: {{game.team_1_score}} - {{game.team_2_score}}<br>
 Time: {{game.start_time}}<br>

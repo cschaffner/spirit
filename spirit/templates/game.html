@@ -12,11 +12,29 @@ $(document).ready(function()
 );</script> -->
 <h1>Spirit scores of game {{game.id}}</h1>
 
+<div>
+{% if first_name %}
+Welcome, {{first_name}}. <a href="/logout/">logout</a>
+{% else %}
+In order to edit spirit scores, you need to <a href="{{loginurl}}">log in</a>.
+{% endif %}
+</div>
+<p>
+
+<div>League: {{game.season.league.name}}</div>
+<div>Season: <a href="/season/{{game.season_id}}">{{game.season.name}}</a></div>
+<div>Tournament: <a href="/tournament/{{game.tournament_id}}">{{game.tournament.name}}</a></div>
+<div>Start Time: {{game.start_time}}</div>
+<div>Field: {{game.game_site_id}}</div>
+
 <div>Team 1: {{game.team_1.name}}</div>
 <div>Team 2: {{game.team_2.name}}</div>
 
-<div>Team 1: Spirit received: {{game.team_1_spirit}}</div>
-<div>Team 2: Spirit received: {{game.team_2_spirit}}</div>
+<div>Spirit received by Team 1: {{game.team_1_spirit}} 
+	{% if game.team_1_spirit_editable %}<a href="/game/{{game.id}}/submit/2/">Edit</a>{% endif %}</div>
+<div>Spirit received by Team 2: {{game.team_2_spirit}} 
+	{% if game.team_2_spirit_editable %}<a href="/game/{{game.id}}/submit/1/">Edit</a>{% endif %}</div>
+
 
 
 <p><div>

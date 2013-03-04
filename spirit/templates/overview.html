@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block content %}
+<script type="text/javascript" src="/static/jscript/jquery-latest.js"></script>
+<script type="text/javascript" src="/static/jscript/jquery.tablesorter.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function()
+	{
+		$("#Teams").tablesorter( {sortList: [[0,0], [1,0]]} );
+	}
+);</script>
+
+{% block title %}{% endblock title %}
+
+<p><div>
+{% for key,val in info.iteritems %}
+	{{key}}: {{val}}<br>
+{% endfor %}
+</div>
+
+<h2>Teams</h2>
+<table id="Teams" class="tablesorter">
+	<thead>
+	<tr>
+		<th>Teams</th>
+		<th>Avg Rec</th>
+		<th>Avg Rec Tot</th>
+		<th>Nr Rec</th>
+		<th>Avg Given</th>
+		<th>Avg Given Tot</th>
+		<th>Nr Given</th>
+	</tr>
+	</thead>
+	<tbody>
+	{% for id,t in teams.iteritems %}
+	<tr><td>{{t.name}}</td>
+		<td>{{t.avg_received}}</td>
+		<td>{{t.avg_received_total|floatformat}}</td>
+		<td>{{t.nr_received}}</td>
+		<td>{{t.avg_given}}</td>
+		<td>{{t.avg_given_total|floatformat}}</td>
+		<td>{{t.nr_given}}</td>
+	</tr>
+	{% endfor %}
+	</tbody>
+</table>
+
+<h2>Games</h2>
+<table>
+	<tr><td>Team 1</td><td>Score</td><td>Team 2</td><td>Team1 rec</td><td>Team2 rec</td></tr>
+	{% for g in games %}
+	<tr><td>{{g.team_1.name}}</td>
+		<td>{{g.team_1_score}} - {{g.team_2_score}}</td>
+		<td>{{g.team_2.name}}</td>
+		{% if g.team_1_spirit_editable %}
+			<td><a href="/game/{{g.id}}/submit/2/">{% if g.team_1_spirit %}{{g.team_1_spirit}}{% else %}enter{% endif %}</a></td>
+		{% else %}
+			<td>{{g.team_1_spirit}}</td>
+		{% endif %}
+		{% if g.team_2_spirit_editable %}
+		<td><a href="/game/{{g.id}}/submit/1/">{% if g.team_2_spirit %}{{g.team_2_spirit}}{% else %}enter{% endif %}</a></td>
+		{% else %}
+			<td>{{g.team_2_spirit}}</td>
+		{% endif %}
+	</tr>
+	{% endfor %}
+</table>
+
+
+{% endblock content %}

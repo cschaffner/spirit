@@ -51,6 +51,12 @@ def api_token_from_code(request,code):
     # determine user
     player = api_me()
     request.session['user_id']=player['id']
+    # for convenience, we also store a list of the user's team ids in the session
+    user_teamids=[]
+    team_playerids=api_team_playeridsbyplayer(player['id']) 
+    for team_ids in team_playerids['objects']:
+        user_teamids.append(team_ids['team_id'])
+    request.session['user_teamids']=user_teamids
     request.session['first_name']=player['first_name']
         
     my_headers={'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': 'bearer {0}'.format(access_token)}  
@@ -121,6 +127,14 @@ def api_me():
     response_dict = simplejson.loads(response.content)
     return response_dict
 
+def api_team_playeridsbyplayer(player_id):
+    url='{0}/v1/team_players/?player_ids=%5B{1}%5D&fields=%5Bteam_id%5D'.format(settings.HOST,player_id)
+    response = requests.get(url=url,headers=my_headers,config=my_config)
+    response_dict = simplejson.loads(response.content)
+    return response_dict
+    
+
+
 def api_team_playersbyplayer(player_id):
     url='{0}/v1/team_players/?player_ids=%5B{1}%5D'.format(settings.HOST,player_id)
     response = requests.get(url=url,headers=my_headers,config=my_config)
@@ -130,6 +144,12 @@ def api_team_playersbyplayer(player_id):
  
 def api_tournamentbyid(tournament_id):
     url='{0}/v1/tournaments/{1}/'.format(settings.HOST,tournament_id)
+    response = requests.get(url=url,headers=my_headers,config=my_config)
+    response_dict = simplejson.loads(response.content)
+    return response_dict
+
+def api_seasonbyid(season_id):
+    url='{0}/v1/seasons/{1}/'.format(settings.HOST,season_id)
     response = requests.get(url=url,headers=my_headers,config=my_config)
     response_dict = simplejson.loads(response.content)
     return response_dict
@@ -221,6 +241,15 @@ def api_gamesbytournament(tournament_id):
     response = requests.get(url=url,headers=my_headers,config=my_config)
     response_dict = simplejson.loads(response.content)
     return response_dict
+
+def api_spiritbyseason(season_id):
+    # the most recent score will be reported first, so we can just go through the list
+    # and the first score with the right properties we encounter will be the most recent one
+    url='{0}/v1/game_sportsmanship_scores/?limit=200&season_id={1}&order_by=%5B-time_last_updated%5D'.format(settings.HOST,season_id)
+    response = requests.get(url=url,headers=my_headers,config=my_config)
+    response_dict = simplejson.loads(response.content)
+    return response_dict
+
 
 def api_spiritbytournament(tournament_id):
     # the most recent score will be reported first, so we can just go through the list
