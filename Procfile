@@ -1,1 +1,1 @@
-web: gunicorn spiritapp.wsgi -b 0.0.0.0:$PORT
+web: gunicorn spirit.wsgi -b 0.0.0.0:$PORT
