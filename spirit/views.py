@@ -148,7 +148,7 @@ def tournament(request,tournament_id):
         g['team_2_spirit_editable'] = g['team_1_id'] in user_teamids
 
     # compute spirit score overview
-    teams,games_wspirit = TeamsFromGames(spirit['objects'],games['objects'],user_teamids)
+    teams,games_wspirit = TeamsFromGames(spirit['objects'],games['objects'])
     return render_to_response('tournament.html',{'id': tournament_id, 'games': games_wspirit, 'teams': teams, 'info': info})
 
 def game(request,game_id):
