@@ -9,7 +9,7 @@ Welcome {{first_name}}<br>
 You are member of the following teams:<br>
 <ul>
 {% for t in team_players %}
-<li><a href="team/{{t.team_id}}/">{{t.team.name}}</a></li>
+<li><a href="team/{{t.team_id}}/">{{t.team.name}}</a> ({{t.team.season.name}}, {{t.team.season.league.name}})</li>
 {% endfor %}
 </ul>
 
