@@ -14,12 +14,11 @@ if HOST=="http://api.playwithlv.com":
     CLIENT_ID = os.environ['CLIENT_ID_PLAYWITHLV']
     CLIENT_PWD = os.environ['CLIENT_PWD_PLAYWITHLV']
     TOKEN_URL = 'http://www.playwithlv.com'
-    REDIRECT_URI = 'http://127.0.0.1:8000/code/'
 else:
     TOKEN_URL = 'https://www.leaguevine.com'    
     CLIENT_ID = os.environ['CLIENT_ID']
     CLIENT_PWD = os.environ['CLIENT_PWD']
-    REDIRECT_URI = 'http://127.0.0.1:8000/code/'
+REDIRECT_URI = os.environ['REDIRECT_URI']
 LOGINURL='{0}/oauth2/authorize/?client_id={1}&response_type=code&redirect_uri={2}&scope=universal'.format(TOKEN_URL,CLIENT_ID,REDIRECT_URI)
 
 

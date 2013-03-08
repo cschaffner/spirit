@@ -10,6 +10,7 @@ urlpatterns = patterns('',
     # Examples:
     url(r'^$', 'spirit.views.home'),
     url(r'^logout/$', 'spirit.views.logout'),
+    url(r'^login/$', 'spirit.views.login'),
     url(r'^code/$', 'spirit.views.code'),
     url(r'^season/(\d+)/$', 'spirit.views.season'),
     url(r'^team/(\d+)/$', 'spirit.views.team'),

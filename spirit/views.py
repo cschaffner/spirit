@@ -50,6 +50,9 @@ def home(request):
         logger.info(pformat(team_players))       
         return render_to_response('spirit_loggedin.html', {'first_name': first_name,
                                                            'team_players': team_players['objects']})
+def login(request):
+    redirect(settings.LOGINURL)
+
 def logout(request):
     # flushes the session down the toilet
     # in particular, erases 'user_id', 'first_name', and 'access_token" and makes it inaccessible for following session
