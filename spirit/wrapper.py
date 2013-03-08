@@ -63,6 +63,18 @@ def api_token_from_code(request,code):
 
     return access_token
 
+def api_get(url):
+    response = requests.get(url=url,headers=my_headers,config=my_config)
+    response_dict = simplejson.loads(response.content)
+    objects=response_dict['objects']
+    while response_dict['meta']['next'] != None:
+        url=response_dict['meta']['next']
+        response = requests.get(url=url,headers=my_headers,config=my_config)
+        response_dict = simplejson.loads(response.content)
+        objects=objects + response_dict['objects']
+    response_dict['objects']=objects
+    return response_dict
+
 
 def api_post(url,dict):
     # does a POST on url, sending dict
@@ -238,48 +250,36 @@ def api_gamesbytournament_restr(tournament_id,offset=0):
 
 def api_gamesbytournament(tournament_id):
     url='{0}/v1/games/?limit=200&tournament_id={1}'.format(settings.HOST,tournament_id)
-    response = requests.get(url=url,headers=my_headers,config=my_config)
-    response_dict = simplejson.loads(response.content)
-    return response_dict
+    return api_get(url)
 
 def api_spiritbyseason(season_id):
     # the most recent score will be reported first, so we can just go through the list
     # and the first score with the right properties we encounter will be the most recent one
     url='{0}/v1/game_sportsmanship_scores/?limit=200&season_id={1}&order_by=%5B-time_last_updated%5D'.format(settings.HOST,season_id)
-    response = requests.get(url=url,headers=my_headers,config=my_config)
-    response_dict = simplejson.loads(response.content)
-    return response_dict
+    return api_get(url)
 
 
 def api_spiritbytournament(tournament_id):
     # the most recent score will be reported first, so we can just go through the list
     # and the first score with the right properties we encounter will be the most recent one
     url='{0}/v1/game_sportsmanship_scores/?limit=200&tournament_id={1}&order_by=%5B-time_last_updated%5D'.format(settings.HOST,tournament_id)
-    response = requests.get(url=url,headers=my_headers,config=my_config)
-    response_dict = simplejson.loads(response.content)
-    return response_dict
+    return api_get(url)
 
 def api_spiritbygame(game_id):
     # the most recent score will be reported first, so we can just go through the list
     # and the first score with the right properties we encounter will be the most recent one
     url='{0}/v1/game_sportsmanship_scores/?limit=200&game_ids=%5B{1}%5D&order_by=%5B-time_last_updated%5D'.format(settings.HOST,game_id)
-    response = requests.get(url=url,headers=my_headers,config=my_config)
-    response_dict = simplejson.loads(response.content)
-    return response_dict
+    return api_get(url)
 
 
 def api_gamesbyseason(season_id):
     url='{0}/v1/games/?limit=200&season_id={1}'.format(settings.HOST,season_id)
-    response = requests.get(url=url,headers=my_headers,config=my_config)
-    response_dict = simplejson.loads(response.content)
-    return response_dict
+    return api_get(url)
 
 
 def api_gamesbyteam(team_id):
     url='{0}/v1/games/?limit=10&team_ids=%5B{1}%5D&order_by=%5B-start_time%5D'.format(settings.HOST,team_id)
-    response = requests.get(url=url,headers=my_headers,config=my_config)
-    response_dict = simplejson.loads(response.content)
-    return response_dict
+    return api_get(url)
 
 
 def api_gamebyid(game_id):

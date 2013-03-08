@@ -21,7 +21,6 @@ else:
 REDIRECT_URI = os.environ['REDIRECT_URI']
 LOGINURL='{0}/oauth2/authorize/?client_id={1}&response_type=code&redirect_uri={2}&scope=universal'.format(TOKEN_URL,CLIENT_ID,REDIRECT_URI)
 
-
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
@@ -169,7 +168,7 @@ LOGGING = {
             'class':'django.utils.log.NullHandler',
         },
         'console':{
-            'level':'DEBUG',
+            'level':'WARNING',
             'class':'logging.StreamHandler',
             'formatter': 'simple'
         },
@@ -191,3 +190,8 @@ LOGGING = {
 
     }
 }
+
+try:
+   from local_settings import *
+except ImportError, e:
+   pass

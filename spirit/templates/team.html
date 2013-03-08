@@ -17,7 +17,7 @@ Welcome {{first_name}}<br>
 {% if g.spirit_received %}
 	{{g.spirit_received}}
 {% else %}
-<a href="/game/{{g.id}}">submit spirit score</a>
+<a href="/game/{{g.id}}/submit/{{g.my_team}}/">submit spirit score</a>
 {% endif %}</div>
 <div>Spirit score you received from {{g.opp.name}}:
 {% if g.spirit_given %}

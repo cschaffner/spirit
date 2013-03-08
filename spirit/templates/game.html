@@ -37,11 +37,11 @@ In order to edit spirit scores, you need to <a href="{{loginurl}}">log in</a>.
 
 
 
-<p><div>
+<!-- <p><div>
 {% for key,val in game.iteritems %}
 	{{key}}: {{val}}<br>
 {% endfor %}
-</div>
+</div> -->
 
 <h2>Spirit History</h2>
 {% for s in spirit.objects %}
@@ -51,6 +51,7 @@ In order to edit spirit scores, you need to <a href="{{loginurl}}">log in</a>.
 	<div>team 1 received: {{s.team_1_score}}</div>
 	<div>team 2 received: {{s.team_2_score}}</div>
 </div>
+<p>
 {% endfor %}
 
 

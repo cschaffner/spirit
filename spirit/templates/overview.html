@@ -8,16 +8,17 @@
 $(document).ready(function()
 	{
 		$("#Teams").tablesorter( {sortList: [[0,0], [1,0]]} );
+		$("#Games").tablesorter( {sortList: [[0,0], [1,0]]} );
 	}
 );</script>
 
 {% block title %}{% endblock title %}
 
-<p><div>
+<!-- <p><div>
 {% for key,val in info.iteritems %}
 	{{key}}: {{val}}<br>
 {% endfor %}
-</div>
+</div> -->
 
 <h2>Teams</h2>
 <table id="Teams" class="tablesorter">
@@ -47,8 +48,10 @@ $(document).ready(function()
 </table>
 
 <h2>Games</h2>
-<table>
-	<tr><td>Team 1</td><td>Score</td><td>Team 2</td><td>Team1 rec</td><td>Team2 rec</td></tr>
+<table id="Games" class="tablesorter">
+	<thead>
+	<tr><th>Team 1</th><th>Score</th><th>Team 2</th><th>Team1 rec</th><th>Team2 rec</th></tr>
+	</thead>
 	{% for g in games %}
 	<tr><td>{{g.team_1.name}}</td>
 		<td>{{g.team_1_score}} - {{g.team_2_score}}</td>

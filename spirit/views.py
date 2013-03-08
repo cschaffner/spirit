@@ -76,11 +76,15 @@ def team(request,team_id):
         spirit=api_spiritbygame(g['id'])
         # figure out which is my team, which is the opponent
         if g['team_1_id']==int(team_id):
+            g['my_team']=1
+            g['opp_team']=2
             g['opp_id']=g['team_2_id']
             g['opp']=g['team_2']
             g['my_score']=g['team_1_score']
             g['opp_score']=g['team_2_score']
         elif g['team_2_id']==int(team_id):
+            g['my_team']=2
+            g['opp_team']=1
             g['opp_id']=g['team_1_id']
             g['opp']=g['team_1']
             g['my_score']=g['team_2_score']
@@ -114,6 +118,13 @@ def season(request,season_id):
         errmsg = '{0}'.format(spirit['errors'])
         return render_to_response('error.html',{'error': errmsg})
 
+    user_id=request.session.get('user_id',None)
+    user_first_name=request.session.get('first_name', None)
+    user_teamids=request.session.get('user_teamids',None)
+    for g in games['objects']:
+        g['team_1_spirit_editable'] = g['team_2_id'] in user_teamids
+        g['team_2_spirit_editable'] = g['team_1_id'] in user_teamids
+
     # compute spirit score overview
     teams,games_wspirit = TeamsFromGames(spirit['objects'],games['objects'])
     return render_to_response('season.html',{'id': season_id, 'games': games_wspirit, 'teams': teams, 'info': info})
@@ -137,7 +148,7 @@ def tournament(request,tournament_id):
         g['team_2_spirit_editable'] = g['team_1_id'] in user_teamids
 
     # compute spirit score overview
-    teams,games_wspirit = TeamsFromGames(spirit['objects'],games['objects'])
+    teams,games_wspirit = TeamsFromGames(spirit['objects'],games['objects'],user_teamids)
     return render_to_response('tournament.html',{'id': tournament_id, 'games': games_wspirit, 'teams': teams, 'info': info})
 
 def game(request,game_id):
