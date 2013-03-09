@@ -3,8 +3,17 @@
 {% block content %}
 <h1>Spirit scores</h1>
 
-Where do you want to go today?<br><br>
-<a href="{{loginurl}}">log in</a> to Leaguevine.
+Where do you want to go today?<br>
+You can view spirit overviews of games, tournaments and seasons (if you know their leaguevine-ids)
+as follows:
+<ul>
+	<li><a href="/game/87018/">/game/87018/</a></li>
+	<li><a href="/tournament/18482/">/tournament/18482/</a></li>
+	<li><a href="/season/20156/">/season/20156</a></li>
+</ul>
+
+<br>
+However, to be able to edit spirit scores, you need to <a href="{{loginurl}}">log in</a> to Leaguevine.
 
 
 {% endblock content %}

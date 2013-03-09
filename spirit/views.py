@@ -51,7 +51,7 @@ def home(request):
         return render_to_response('spirit_loggedin.html', {'first_name': first_name,
                                                            'team_players': team_players['objects']})
 def login(request):
-    redirect(settings.LOGINURL)
+    return redirect(settings.LOGINURL)
 
 def logout(request):
     # flushes the session down the toilet
@@ -71,9 +71,15 @@ def code(request):
 def team(request,team_id):
     t=api_teambyid(team_id)
     games=api_gamesbyteam(team_id)
+    user_id=request.session.get('user_id',None)
+    user_first_name=request.session.get('first_name', None)
+    user_teamids=request.session.get('user_teamids',[])
+    
+    
+    game_ids=[]
     for g in games['objects']:
-        # retrieve spirit scores
-        spirit=api_spiritbygame(g['id'])
+        # make a list of game_ids so that all those spirit scores can be retrieved later in one query
+        game_ids.append(g['id'])
         # figure out which is my team, which is the opponent
         if g['team_1_id']==int(team_id):
             g['my_team']=1
@@ -82,6 +88,10 @@ def team(request,team_id):
             g['opp']=g['team_2']
             g['my_score']=g['team_1_score']
             g['opp_score']=g['team_2_score']
+            if g['team_1_id'] in user_teamids:
+                g['spirit_given_editable']=True
+            if g['team_2_id'] in user_teamids:
+                g['spirit_received_editable']=True
         elif g['team_2_id']==int(team_id):
             g['my_team']=2
             g['opp_team']=1
@@ -89,10 +99,35 @@ def team(request,team_id):
             g['opp']=g['team_1']
             g['my_score']=g['team_2_score']
             g['opp_score']=g['team_1_score']
+            if g['team_2_id'] in user_teamids:
+                g['spirit_given_editable']=True
+            if g['team_1_id'] in user_teamids:
+                g['spirit_received_editable']=True
         else:
             logger.error('at least one of the teams should be the one with id: {0}'.format(team_id))
         g['score_string']=score_string(g['my_score'],g['opp_score'])
-        
+
+    # retrieve spirit score of all games in game_ids
+    spirit = api_spiritbygame(game_ids)
+    
+    for g in games['objects']:
+        if g['team_1_id']==int(team_id):
+            for s in spirit['objects']:
+                if s['team_1_id']==int(team_id) and s['team_2_id']==g['team_2_id']:
+                    if not 'spirit_received' in g and s['team_1_score'] != u'':
+                        g['spirit_received']=json.loads(s['team_1_score'])
+                    if not 'spirit_given' in g and s['team_2_score'] != u'':
+                        g['spirit_given']=json.loads(s['team_2_score'])
+        elif g['team_2_id']==int(team_id):
+            for s in spirit['objects']:
+                if s['team_2_id']==int(team_id) and s['team_1_id']==g['team_1_id']:
+                    if not 'spirit_received' in g and s['team_2_score'] != u'':
+                        g['spirit_received']=json.loads(s['team_2_score'])
+                    if not 'spirit_given' in g and s['team_1_score'] != u'':
+                        g['spirit_given']=json.loads(s['team_1_score'])
+        else:
+            logger.error('at least one of the teams should be the one with id: {0}'.format(team_id))
+    
         
     return render_to_response('team.html', {'team': t,
                                             'games': games['objects'],
@@ -120,14 +155,18 @@ def season(request,season_id):
 
     user_id=request.session.get('user_id',None)
     user_first_name=request.session.get('first_name', None)
-    user_teamids=request.session.get('user_teamids',None)
+    user_teamids=request.session.get('user_teamids',[])
     for g in games['objects']:
         g['team_1_spirit_editable'] = g['team_2_id'] in user_teamids
         g['team_2_spirit_editable'] = g['team_1_id'] in user_teamids
 
     # compute spirit score overview
     teams,games_wspirit = TeamsFromGames(spirit['objects'],games['objects'])
-    return render_to_response('season.html',{'id': season_id, 'games': games_wspirit, 'teams': teams, 'info': info})
+    return render_to_response('season.html',{'first_name': first_name, 
+                                             'id': season_id, 
+                                             'games': games_wspirit, 
+                                             'teams': teams, 
+                                             'info': info})
 
 
 def tournament(request,tournament_id):
@@ -142,14 +181,18 @@ def tournament(request,tournament_id):
 
     user_id=request.session.get('user_id',None)
     user_first_name=request.session.get('first_name', None)
-    user_teamids=request.session.get('user_teamids',None)
+    user_teamids=request.session.get('user_teamids',[])
     for g in games['objects']:
         g['team_1_spirit_editable'] = g['team_2_id'] in user_teamids
         g['team_2_spirit_editable'] = g['team_1_id'] in user_teamids
 
     # compute spirit score overview
     teams,games_wspirit = TeamsFromGames(spirit['objects'],games['objects'])
-    return render_to_response('tournament.html',{'id': tournament_id, 'games': games_wspirit, 'teams': teams, 'info': info})
+    return render_to_response('tournament.html',{'first_name': first_name, 
+                                                 'id': tournament_id, 
+                                                 'games': games_wspirit, 
+                                                 'teams': teams, 
+                                                 'info': info})
 
 def game(request,game_id):
     # retrieve this game
@@ -161,7 +204,7 @@ def game(request,game_id):
     
     user_id=request.session.get('user_id',None)
     user_first_name=request.session.get('first_name', None)
-    user_teamids=request.session.get('user_teamids',None)
+    user_teamids=request.session.get('user_teamids',[])
     game['team_2_spirit_editable'] = game['team_1_id'] in user_teamids
     game['team_1_spirit_editable'] = game['team_2_id'] in user_teamids
     
@@ -201,9 +244,9 @@ def game_submit(request,game_id,team_giving):
     first_name=request.session.get('first_name',None)
     user_team_ids=request.session.get('user_teamids',None)
     if (team_giving == u'1' and not game['team_1_id'] in user_team_ids):
-        return render_to_response('error.html', {'error': 'You are not a member of team {0}'.format(game['team_1']['name'])})
+        return render_to_response('error.html', {'error': 'You have to be a member of team {0} in order to submit this spirit score (and you are not).'.format(game['team_1']['name'])})
     if (team_giving == u'2' and not game['team_2_id'] in user_team_ids):
-        return render_to_response('error.html', {'error': 'You are not a member of team {0}'.format(game['team_2']['name'])})
+        return render_to_response('error.html', {'error': 'You have to be a member of team {0} in order to submit this spirit score (and you are not).'.format(game['team_2']['name'])})
     
     if request.method == 'POST': # If the form has been submitted...
         form = SpiritForm(request.POST) # A form bound to the POST data

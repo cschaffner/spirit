@@ -9,7 +9,17 @@
 
 <body>
     <div id="content">
-    	<i>All scores displayed are <b>not</b> actual scores, we are just testing for now!</i>
+    	<p><i>All scores displayed are <b>not</b> actual scores, we are just testing for now!</i></p>
+    	{% block user %}
+	    	<p><div>
+			{% if first_name %}
+			Welcome, {{first_name}}. <a href="/logout/">logout</a>
+			{% else %}
+			In order to edit spirit scores, you need to <a href="/login/">log in</a>.
+			{% endif %}
+			</div>
+			</p>
+		{% endblock %}
         {% block content %}{% endblock %}
     </div>
 </body>
