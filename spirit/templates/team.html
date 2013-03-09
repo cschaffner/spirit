@@ -10,8 +10,8 @@
 <div>Field: {{g.game_site.name}}</div>
 <div>Time: {{g.start_time}}</div>
 <div>Opponent: <a href="/team/{{g.opp_id}}/">{{g.opp.name}}</a></div>
-<div>Result: <a href="/game/{{g.id}}/">{{g.score_string}}</a></div>
-<div>Spirit score you give to {{g.opp.name}}: 
+<div>Result: {{g.score_string}}</div>
+<div><a href="/game/{{g.id}}/">Spirit score</a> you give to {{g.opp.name}}: 
 {% if g.spirit_given_editable %}
 	<a href="/game/{{g.id}}/submit/{{g.my_team}}/">
 	{% if g.spirit_given %}{{g.spirit_given}}{% else %}submit spirit score{% endif %}
