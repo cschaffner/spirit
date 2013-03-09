@@ -131,7 +131,7 @@ def team(request,team_id):
         
     return render_to_response('team.html', {'team': t,
                                             'games': games['objects'],
-                                            'first_name': request.session['first_name']})
+                                            'first_name': user_first_name})
 def score_string(my_score,opp_score):
     # returns a string like "W 12-8" or "L 4-15" or "T 5-5"
     if int(my_score) > int(opp_score):
@@ -162,7 +162,7 @@ def season(request,season_id):
 
     # compute spirit score overview
     teams,games_wspirit = TeamsFromGames(spirit['objects'],games['objects'])
-    return render_to_response('season.html',{'first_name': first_name, 
+    return render_to_response('season.html',{'first_name': user_first_name, 
                                              'id': season_id, 
                                              'games': games_wspirit, 
                                              'teams': teams, 
@@ -188,7 +188,7 @@ def tournament(request,tournament_id):
 
     # compute spirit score overview
     teams,games_wspirit = TeamsFromGames(spirit['objects'],games['objects'])
-    return render_to_response('tournament.html',{'first_name': first_name, 
+    return render_to_response('tournament.html',{'first_name': user_first_name, 
                                                  'id': tournament_id, 
                                                  'games': games_wspirit, 
                                                  'teams': teams, 

@@ -53,9 +53,9 @@ $(document).ready(function()
 	<tr><th>Team 1</th><th>Score</th><th>Team 2</th><th>Team1 rec</th><th>Team2 rec</th></tr>
 	</thead>
 	{% for g in games %}
-	<tr><td>{{g.team_1.name}}</td>
-		<td>{{g.team_1_score}} - {{g.team_2_score}}</td>
-		<td>{{g.team_2.name}}</td>
+	<tr><td><a href="/team/{{g.team_1_id}}/">{{g.team_1.name}}</a></td>
+		<td><a href="/game/{{g.id}}/">{{g.team_1_score}} - {{g.team_2_score}}</a></td>
+		<td><a href="/team/{{g.team_2_id}}/">{{g.team_2.name}}</a></td>
 		{% if g.team_1_spirit_editable %}
 			<td><a href="/game/{{g.id}}/submit/2/">{% if g.team_1_spirit %}{{g.team_1_spirit}}{% else %}enter{% endif %}</a></td>
 		{% else %}
