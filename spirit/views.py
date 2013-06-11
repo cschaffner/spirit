@@ -111,20 +111,20 @@ def team(request,team_id):
     spirit = api_spiritbygame(game_ids)
     
     for g in games['objects']:
-        if g['team_1_id']==int(team_id):
+        if g['team_1_id'] == int(team_id):
             for s in spirit['objects']:
-                if s['team_1_id']==int(team_id) and s['team_2_id']==g['team_2_id']:
+                if s['game_id'] == g['id']:
                     if not 'spirit_received' in g and s['team_1_score'] != u'':
-                        g['spirit_received']=json.loads(s['team_1_score'])
+                        g['spirit_received'] = json.loads(s['team_1_score'])
                     if not 'spirit_given' in g and s['team_2_score'] != u'':
-                        g['spirit_given']=json.loads(s['team_2_score'])
-        elif g['team_2_id']==int(team_id):
+                        g['spirit_given'] = json.loads(s['team_2_score'])
+        elif g['team_2_id'] == int(team_id):
             for s in spirit['objects']:
-                if s['team_2_id']==int(team_id) and s['team_1_id']==g['team_1_id']:
+                if s['game_id'] == g['id']:
                     if not 'spirit_received' in g and s['team_2_score'] != u'':
-                        g['spirit_received']=json.loads(s['team_2_score'])
+                        g['spirit_received'] = json.loads(s['team_2_score'])
                     if not 'spirit_given' in g and s['team_1_score'] != u'':
-                        g['spirit_given']=json.loads(s['team_1_score'])
+                        g['spirit_given'] = json.loads(s['team_1_score'])
         else:
             logger.error('at least one of the teams should be the one with id: {0}'.format(team_id))
     
@@ -307,12 +307,24 @@ def game_submit(request,game_id,team_giving):
     })
 
 def TeamsFromGames(spirit,games):
+    # first go through the whole list and fill in missing team_id's
+    # we should be able to get them from the according games
+    for score in spirit:
+        if score['team_1_id'] == None or score['team_2_id'] == None:
+            for g in games:
+                if g['id'] == score['game_id']:
+                    score['team_1_id'] = g['team_1_id']
+                    score['team_1'] = g['team_1']
+                    score['team_2_id'] = g['team_2_id']
+                    score['team_2']  = g['team_2']
+                    break             
+    
     # computes a dictionary of team names and accumulated spirit scores from the data in games
-    teams={}
+    teams = {}
     for score in spirit:
         # spirit scores are sorted by time_last_updated
         # so we simply go through the list and take the first score that matches
-        if score['team_1_id']!=None and score['team_2_id']!=None:
+        if score['team_1_id'] != None and score['team_2_id'] != None:
             if not score['team_1_id'] in teams:
                 teams[score['team_1_id']]={'name': score['team_1']['name'],
                                            'received': {},
@@ -325,22 +337,24 @@ def TeamsFromGames(spirit,games):
                 # decode string into list
                 team_1_score=json.loads(score['team_1_score'])
                 # double check
-                if len(team_1_score)<=1:
-                    logger.error('decoding did probably not work!')
-                if not score['game_id'] in teams[score['team_1_id']]['received']:
-                    teams[score['team_1_id']]['received'][score['game_id']]=team_1_score
-                if not score['game_id'] in teams[score['team_2_id']]['given']:
-                    teams[score['team_2_id']]['given'][score['game_id']]=team_1_score
+                if len(team_1_score)<=1 or not _score_is_valid(team_1_score):
+                    logger.error('decoding of {0} did probably not work!'.format(team_1_score))
+                else:
+                    if not score['game_id'] in teams[score['team_1_id']]['received']:
+                        teams[score['team_1_id']]['received'][score['game_id']]=team_1_score
+                    if not score['game_id'] in teams[score['team_2_id']]['given']:
+                        teams[score['team_2_id']]['given'][score['game_id']]=team_1_score
             if score['team_2_score']!=u'':
                 # decode string into list
                 team_2_score=json.loads(score['team_2_score'])
-                # double check
-                if len(team_2_score)<=1:
-                    logger.error('decoding did probably not work!')
-                if not score['game_id'] in teams[score['team_2_id']]['received']:
-                    teams[score['team_2_id']]['received'][score['game_id']]=team_2_score
-                if not score['game_id'] in teams[score['team_1_id']]['given']:
-                    teams[score['team_1_id']]['given'][score['game_id']]=team_2_score
+                # double check                        
+                if len(team_2_score)<=1 or not _score_is_valid(team_2_score):
+                    logger.error('decoding of {0} did probably not work!'.format(team_2_score))
+                else:
+                    if not score['game_id'] in teams[score['team_2_id']]['received']:
+                        teams[score['team_2_id']]['received'][score['game_id']]=team_2_score
+                    if not score['game_id'] in teams[score['team_1_id']]['given']:
+                        teams[score['team_1_id']]['given'][score['game_id']]=team_2_score
             elif score['team_1_score']==u'':
                 logger.warning('strangely, no team seems to have a spirit score...')
                 
@@ -366,6 +380,17 @@ def TeamsFromGames(spirit,games):
             teams[id]['avg_given_total']=sum(teams[id]['avg_given'])
     logger.info(pformat(teams))
     return teams,games
+
+def _score_is_valid(score):
+    try:
+        if len(score) != 5:
+            return False
+        for s in score:
+            if not isinstance(s, int):
+                return False
+        return True
+    except:
+        return False
 
 def list_avg(list):
     # takes unicode list of lists and computes average
