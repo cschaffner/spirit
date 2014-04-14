@@ -4,21 +4,38 @@ ROOT_PATH = os.path.dirname(__file__)
 
 OFFLINE = False
 
+try:
+   from local_settings import *
+except ImportError, e:
+   pass
+
 # allows to switch between the real and the testing leaguevine server
 #HOST="http://api.playwithlv.com"
 HOST="https://api.leaguevine.com"
 
 # expects credentials to be stored in environmental variables!
+ON_HEROKU = False
+if 'ON_HEROKU' in os.environ:
+    ON_HEROKU = True
+    DEBUG = os.environ.get('DEBUG', False) # if DEBUG exists on Heroku, use DEBUG mode, otherwise not
+else:
+    DEBUG = True
+
+if ON_HEROKU:
+    if HOST=="http://api.playwithlv.com":
+        CLIENT_ID = os.environ['CLIENT_ID_PLAYWITHLV']
+        CLIENT_PWD = os.environ['CLIENT_PWD_PLAYWITHLV']
+        TOKEN_URL = 'http://www.playwithlv.com'
+    else:
+        CLIENT_ID = os.environ['CLIENT_ID']
+        CLIENT_PWD = os.environ['CLIENT_PWD']
+        TOKEN_URL = 'https://www.leaguevine.com'
+    REDIRECT_URI = os.environ['REDIRECT_URI']
 
 if HOST=="http://api.playwithlv.com":
-    CLIENT_ID = os.environ['CLIENT_ID_PLAYWITHLV']
-    CLIENT_PWD = os.environ['CLIENT_PWD_PLAYWITHLV']
     TOKEN_URL = 'http://www.playwithlv.com'
 else:
-    TOKEN_URL = 'https://www.leaguevine.com'    
-    CLIENT_ID = os.environ['CLIENT_ID']
-    CLIENT_PWD = os.environ['CLIENT_PWD']
-REDIRECT_URI = os.environ['REDIRECT_URI']
+    TOKEN_URL = 'https://www.leaguevine.com'
 LOGINURL='{0}/oauth2/authorize/?client_id={1}&response_type=code&redirect_uri={2}&scope=universal'.format(TOKEN_URL,CLIENT_ID,REDIRECT_URI)
 
 DEBUG = True
@@ -190,8 +207,3 @@ LOGGING = {
 
     }
 }
-
-try:
-   from local_settings import *
-except ImportError, e:
-   pass
