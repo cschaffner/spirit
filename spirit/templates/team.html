@@ -8,7 +8,7 @@
 {% for g in games %}
 <div>Tournament: <a href="/tournament/{{g.tournament.id}}/">{{g.tournament.name}}</a></div>
 <div>Field: {{g.game_site.name}}</div>
-<div>Time: {{g.start_time}}</div>
+<div>Time: {{g.datetime|date:"D d M Y, H:i"}}</div>
 <div>Opponent: <a href="/team/{{g.opp_id}}/">{{g.opp.name}}</a></div>
 <div>Result: <a href="/game/{{g.id}}/">{{g.score_string}}</a></div>
 <div>Spirit score {{ team.name }} gives to {{g.opp.name}}:
