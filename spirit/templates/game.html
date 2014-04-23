@@ -22,9 +22,15 @@ $(document).ready(function()
 <div>Team 2: <a href="/team/{{game.team_2_id}}/">{{game.team_2.name}}</a></div>
 
 <div>Spirit of Team 1: {{game.team_1_spirit}} 
-	{% if game.team_1_spirit_editable %}<a href="/game/{{game.id}}/submit/2/">Edit</a>{% endif %}</div>
-<div>Spirit of Team 2: {{game.team_2_spirit}} 
-	{% if game.team_2_spirit_editable %}<a href="/game/{{game.id}}/submit/1/">Edit</a>{% endif %}</div>
+{#	{% if first_name %}<a href="/game/{{game.id}}/submit/2/">Edit</a>{% endif %}</div>#}
+	<a href="/game/{{game.id}}/submit/2/">Edit</a></div>
+<div>Spirit Comment for Team 1: {{game.team_1_comment}}</div>
+
+
+<div>Spirit of Team 2: {{game.team_2_spirit}}
+{#	{% if first_name %}<a href="/game/{{game.id}}/submit/1/">Edit</a>{% endif %}</div>#}
+	<a href="/game/{{game.id}}/submit/1/">Edit</a></div>
+<div>Spirit Comments for Team 2: {{game.team_2_comment}}</div>
 
 
 
@@ -40,7 +46,9 @@ $(document).ready(function()
 	<div>created by: {{s.created_by.first_name}} {{s.created_by.last_name}}</div>
 	<div>time: {{s.time_last_updated}}</div>
 	<div>team 1 received: {{s.team_1_score}}</div>
+	<div>team 1 comment received: {{s.team_1_comment}}</div>
 	<div>team 2 received: {{s.team_2_score}}</div>
+	<div>team 2 comment received: {{s.team_2_comment}}</div>
 </div>
 <p>
 {% endfor %}

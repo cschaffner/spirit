@@ -11,8 +11,8 @@ Tournament: {{game.tournament.name}}<br>
 Season: {{game.season.name}}<br>
 League: {{game.season.league.name}}<br>
 <br>
-Team giving spirit: {{team_giving_name}}<br>
-Team receiving spirit: {{team_receiving_name}}<br>
+Team {{team_giving_name}} gives the following spirit scores to
+Team {{team_receiving_name}}<br>
 
 <form action="/game/{{game.id}}/submit/{{team_giving}}/" method="post">{% csrf_token %}
 {{ form.as_p }}

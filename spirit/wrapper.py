@@ -2,7 +2,6 @@
 ## operates on tournament_id basis
 ## todo: all Windmill logic should be kept out of here... 
 
-from django.utils import simplejson
 from django.conf import settings
 from django.core.cache import cache
 import requests
@@ -17,7 +16,7 @@ from pprint import pformat
 logger = logging.getLogger('spirit')
 
 access_token = cache.get('access_token')
-if access_token == None:
+if access_token is None:
     # Make a request for an access_token
     if settings.OFFLINE:
         access_token='offline'
@@ -25,16 +24,18 @@ if access_token == None:
         url=u'{0}/oauth2/token/?client_id={1}&client_secret={2}&grant_type=client_credentials&scope=universal'.format(settings.TOKEN_URL, settings.CLIENT_ID, settings.CLIENT_PWD)
         r=requests.get(url)
         # parse string into Python dictionary
-        r_dict = simplejson.loads(r.content)
+        r_dict = r.json()
         access_token = r_dict.get('access_token')
         cache.set('access_token', access_token)
         cache.set('user_id', u'anonymous')
         logger.info('in wrapper: retrieved a new access token: {0}'.format(access_token))
 else:
     logger.info('in wrapper: retrieved token from cache')
-            
-my_headers={'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': 'bearer {0}'.format(access_token)}  
-my_config={'verbose': sys.stderr}
+
+session = requests.Session()
+session.headers.update({'Authorization': 'bearer {0}'.format(access_token),
+                  'Content-Type': 'application/json',
+                  'Accept': 'application/json'})
 
 def api_token_from_code(request,code):
     global my_headers
@@ -42,7 +43,7 @@ def api_token_from_code(request,code):
     url=u'{0}/oauth2/token/?client_id={1}&client_secret={2}&code={3}&grant_type=authorization_code&redirect_uri={4}'.format(settings.TOKEN_URL, settings.CLIENT_ID, settings.CLIENT_PWD, code, settings.REDIRECT_URI)
     r=requests.get(url)
     # parse string into Python dictionary
-    r_dict = simplejson.loads(r.content)
+    r_dict = r.json()
     access_token = r_dict.get('access_token')
     request.session['access_token']=access_token
     cache.set('access_token', access_token)
@@ -59,132 +60,118 @@ def api_token_from_code(request,code):
     request.session['user_teamids']=user_teamids
     request.session['first_name']=player['first_name']
         
-    my_headers={'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': 'bearer {0}'.format(access_token)}  
+    # my_headers={'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': 'bearer {0}'.format(access_token)}
 
     return access_token
 
 def api_get(url):
-    response = requests.get(url=url,headers=my_headers,config=my_config)
-    response_dict = simplejson.loads(response.content)
+    response = session.get(url)
+    response_dict = response.json()
     objects=response_dict['objects']
     while response_dict['meta']['next'] != None:
         url=response_dict['meta']['next']
-        response = requests.get(url=url,headers=my_headers,config=my_config)
-        response_dict = simplejson.loads(response.content)
+        response = session.get(url)
+        response_dict = response.json()
         objects=objects + response_dict['objects']
     response_dict['objects']=objects
     return response_dict
 
 
-def api_post(url,dict):
-    # does a POST on url, sending dict
-    datastring=json.dumps(dict)
-    logger.info(datastring)
-    response=requests.post(url=url,headers=my_headers,config=my_config,data=datastring)
-    if response.status_code == 400: # what's that?
-        logger.error(response.text)
-        response.raise_for_status
-    elif response.status_code<>201: # if not "created"
+def api_post(url, dict):
+    response = session.post(url, data=json.dumps(dict))
+    if response.status_code != requests.codes.created:
         logger.error(response.status_code)
         logger.error(response.text)
-        response.raise_for_status()        
-    response_dict = simplejson.loads(response.content)
-    logger.info(pformat(response_dict))
-    return response_dict    
+        response.raise_for_status()
 
-def api_put(url,dict):
-    # does a PUT on url, sending dict
-    datastring=json.dumps(dict)
-    logger.info('gonna PUT: {0}'.format(pformat(datastring)))
-    response=requests.put(url=url,headers=my_headers,config=my_config,data=datastring)
-    if response.status_code == 400: # what's that?
-        logger.error(response.text)
-        response.raise_for_status
-    elif response.status_code<>202: # if the update is not "accepted"
+    logger.info(pformat(response.json()))
+    return response.json()
+
+
+def api_put(url, dict):
+    response = session.put(url, data=json.dumps(dict))
+    if response.status_code != requests.codes.accepted:
         logger.error(response.status_code)
         logger.error(response.text)
-        response.raise_for_status()        
-    response_dict = simplejson.loads(response.content)
-    logger.info(pformat(response_dict))
-    return response_dict    
+        response.raise_for_status()
 
-def api_update(url,updatedict={}):
+    logger.info(pformat(response.json()))
+    return response.json()
+
+
+def api_update(url, updatedict={}):
     # first retrieves the data of an object
     # then merges the fields with updatedict
     # and PUTs it again
     # works e.g. for tournaments and games
 
-    response = requests.get(url=url,headers=my_headers,config=my_config)
-    response_dict = simplejson.loads(response.content)
-    
-    new_dict={}
-    for key,val in response_dict.iteritems():
-        if ((val is not None) and (not isinstance(val, dict)) and (key != 'leaguevine_url') and 
-            (key != 'resource_uri') and (key!='time_last_updated') and (key!='time_created') and
-            (key != 'objects')):
-            new_dict[key]=val
-            # fix a leaguevine bug here:
-            if key=="start_time" and val[-6:]=="+01:20":
-                new_dict[key]=val[:-6]+"+02:00"
-                
+    response = session.get(url)
+    response_dict = response.json()
+
+    new_dict = {}
+    for key, val in response_dict.iteritems():
+        if ((val is not None) and (not isinstance(val, dict)) and (key != 'leaguevine_url') and
+                (key != 'resource_uri') and (key != 'time_last_updated') and (key != 'time_created') and
+                (key != 'objects')):
+            new_dict[key] = val
+            # # fix a leaguevine bug here:
+            if key == "start_time" and val[-6:] == "+01:20":
+                raise Exception('problem here!!!')
+                new_dict[key] = val[:-6] + "+02:00"
+
     logger.info('before updating: {0}'.format(pformat(new_dict)))
     new_dict.update(updatedict)
     logger.info('after updating: {0}'.format(pformat(new_dict)))
-    
-    return api_put(url,new_dict)
+
+    return api_put(url, new_dict)
+
 
 def api_me():
     url='{0}/v1/players/me/'.format(settings.HOST)
-    response = requests.get(url=url,headers=my_headers,config=my_config)
-    response_dict = simplejson.loads(response.content)
-    return response_dict
+    response = session.get(url)
+    return response.json()
+
 
 def api_team_playeridsbyplayer(player_id):
     url='{0}/v1/team_players/?player_ids=%5B{1}%5D&fields=%5Bteam_id%5D'.format(settings.HOST,player_id)
-    response = requests.get(url=url,headers=my_headers,config=my_config)
-    response_dict = simplejson.loads(response.content)
-    return response_dict
+    response = session.get(url)
+    return response.json()
     
-
 
 def api_team_playersbyplayer(player_id):
     url='{0}/v1/team_players/?player_ids=%5B{1}%5D'.format(settings.HOST,player_id)
-    response = requests.get(url=url,headers=my_headers,config=my_config)
-    response_dict = simplejson.loads(response.content)
-    return response_dict
+    response = session.get(url)
+    return response.json()
     
  
 def api_tournamentbyid(tournament_id):
     url='{0}/v1/tournaments/{1}/'.format(settings.HOST,tournament_id)
-    response = requests.get(url=url,headers=my_headers,config=my_config)
-    response_dict = simplejson.loads(response.content)
-    return response_dict
+    response = session.get(url)
+    return response.json()
 
 def api_seasonbyid(season_id):
     url='{0}/v1/seasons/{1}/'.format(settings.HOST,season_id)
-    response = requests.get(url=url,headers=my_headers,config=my_config)
-    response_dict = simplejson.loads(response.content)
-    return response_dict
+    response = session.get(url)
+    return response.json()
 
 def api_tournament_teams(tournament_id):
     url='{0}/v1/tournament_teams/?tournament_ids=%5B{1}%5D&limit=200'.format(settings.HOST,tournament_id)
-    response = requests.get(url=url,headers=my_headers,config=my_config)
-    response_dict = simplejson.loads(response.content)
-    return response_dict
+    response = session.get(url)
+    return response.json()
 
 def api_nrswissrounds(tournament_id):
 # returns the number of existing swissdraw rounds
     if settings.OFFLINE:
         return 6
     url='{0}/v1/swiss_rounds/?tournament_id={1}&fields=%5Bid%5D'.format(settings.HOST,tournament_id)
-    response = requests.get(url=url,headers=my_headers,config=my_config)
-    response_dict = simplejson.loads(response.content)
+    response = session.get(url)
+    response_dict = response.json()
     return response_dict['meta']['total_count']
 
 def api_game_final(game_id):
     url='{0}/v1/game_scores/?game_id={1}&order_by=%5B-id%5D&limit=30'.format(settings.HOST,game_id)
-    response = requests.get(url=url,headers=my_headers,config=my_config)
-    response_dict = simplejson.loads(response.content)
+    response = session.get(url)
+    response_dict = response.json()
     final=False
     for gu in response_dict['objects']:
         if gu['is_final']:
@@ -194,8 +181,8 @@ def api_game_final(game_id):
 
 def api_swissround_final(tournament_id,round_number):
     url='{0}/v1/swiss_rounds/?tournament_id={1}&round_number={2}&fields=%5Bgames%5D'.format(settings.HOST,tournament_id,round_number)
-    response = requests.get(url=url,headers=my_headers,config=my_config)
-    response_dict = simplejson.loads(response.content)
+    response = session.get(url)
+    response_dict = response.json()
     final=True
     for g in response_dict['objects'][0]['games']:
         if not api_game_final(g['id']):
@@ -214,9 +201,8 @@ def api_swissroundinfo_roundonly(tournament_id,round_number=None,ordered=False):
             url='{0}/v1/swiss_rounds/?tournament_id={1}&fields=%5Bround_number%5D'.format(settings.HOST,tournament_id)            
     else:
         url='{0}/v1/swiss_rounds/?tournament_id={1}&fields=%5Bround_number%5D&round_number={2}'.format(settings.HOST,tournament_id,round_number)        
-    response = requests.get(url=url,headers=my_headers,config=my_config)
-    response_dict = simplejson.loads(response.content)
-    return response_dict
+    response = session.get(url)
+    return response.json()
 
     
 def api_swissroundinfo(tournament_id,round_number=None,ordered=False):
@@ -230,23 +216,21 @@ def api_swissroundinfo(tournament_id,round_number=None,ordered=False):
             url='{0}/v1/swiss_rounds/?tournament_id={1}'.format(settings.HOST,tournament_id)            
     else:
         url='{0}/v1/swiss_rounds/?tournament_id={1}&round_number={2}'.format(settings.HOST,tournament_id,round_number)        
-    response = requests.get(url=url,headers=my_headers,config=my_config)
-    response_dict = simplejson.loads(response.content)
-    return response_dict
+    response = session.get(url)
+    return response.json()
+
 
 def api_poolinfo(tournament_id):
     url='{0}/v1/pool_rounds/?tournament_id={1}'.format(settings.HOST,tournament_id)
-    response = requests.get(url=url,headers=my_headers,config=my_config)
-    response_dict = simplejson.loads(response.content)
-    return response_dict
+    response = session.get(url)
+    return response.json()
 
 def api_gamesbytournament_restr(tournament_id,offset=0):
     url='{0}/v1/games/?limit=200&tournament_id={1}&order_by=%5Bid%5D&fields=%5Bteam_1%2Cteam_1_id%2Cteam_2%2Cteam_2_id%2Cgame_site%2Cstart_time%2Cid%2Ctournament%5D&'.format(settings.HOST,tournament_id)
     if offset>0:
         url += '&offset={0}'.format(offset)
-    response = requests.get(url=url,headers=my_headers,config=my_config)
-    response_dict = simplejson.loads(response.content)
-    return response_dict
+    response = session.get(url)
+    return response.json()
 
 def api_gamesbytournament(tournament_id):
     url='{0}/v1/games/?limit=200&tournament_id={1}'.format(settings.HOST,tournament_id)
@@ -289,27 +273,23 @@ def api_gamesbyteam(team_id):
 
 def api_gamebyid(game_id):
     url='{0}/v1/games/{1}/'.format(settings.HOST,game_id)
-    response = requests.get(url=url,headers=my_headers,config=my_config)
-    response_dict = simplejson.loads(response.content)
-    return response_dict
+    response = session.get(url)
+    return response.json()
 
 def api_bracketsbytournament(tournament_id):
     url='{0}/v1/brackets/?limit=50&tournament_id={1}'.format(settings.HOST,tournament_id)
-    response = requests.get(url=url,headers=my_headers,config=my_config)
-    response_dict = simplejson.loads(response.content)
-    return response_dict
+    response = session.get(url)
+    return response.json()
 
 def api_bracketbyid(bracket_id):
     url='{0}/v1/brackets/{1}/'.format(settings.HOST,bracket_id)
-    response = requests.get(url=url,headers=my_headers,config=my_config)
-    response_dict = simplejson.loads(response.content)
-    return response_dict
+    response = session.get(url)
+    return response.json()
 
 def api_teambyid(team_id):
     url='{0}/v1/teams/{1}/'.format(settings.HOST,team_id)
-    response = requests.get(url=url,headers=my_headers,config=my_config)
-    response_dict = simplejson.loads(response.content)
-    return response_dict
+    response = session.get(url)
+    return response.json()
 
 def api_rankedteamids(tournament_id,round_number):
     swiss = api_swissroundinfo(tournament_id,round_number)
@@ -320,8 +300,8 @@ def api_rankedteamids(tournament_id,round_number):
     return idlist
 
 def api_url(url):
-    response = requests.get(url=url,headers=my_headers,config=my_config)
-    response_dict = simplejson.loads(response.content)
+    response = session.get(url)
+    response_dict = response.json()
     logger.info(response_dict)
     return response_dict
     
@@ -335,40 +315,40 @@ def api_result(game_id,score1,score2,final=False):
                 "is_final": "{0}".format(final)}
     return api_post(url,game_dict)
 
-def api_cleanteams(tournament_id):
-    # retrieve all teams of a particular tournament
-    url='{0}/v1/tournament_teams/?tournament_ids=%5B{1}%5D'.format(settings.HOST,tournament_id) 
-    next=True  
-    while next:
-        # we do not use the next-url, but the original one because we have removed some teams in the meantime
-        response = requests.get(url=url,headers=my_headers,config=my_config)
-        response_dict = simplejson.loads(response.content)
-        logger.info(response_dict)
-        
-        for team in response_dict.get('objects'):
-            # remove this team from tournament
-            remove_url='{0}/v1/tournament_teams/{1}/{2}/'.format(settings.HOST,tournament_id,team.get('team_id'))
-            response = requests.delete(url=remove_url,headers=my_headers,config=my_config)
-            if response.status_code == 204:
-                logger.info('removed team with id {0}'.format(team.get('team_id')))
-            else:
-                response.raise_for_status()
-            
-        # check if there are more teams
-        next=response_dict.get('meta').get('next')
-    return
+# def api_cleanteams(tournament_id):
+#     # retrieve all teams of a particular tournament
+#     url='{0}/v1/tournament_teams/?tournament_ids=%5B{1}%5D'.format(settings.HOST,tournament_id)
+#     next=True
+#     while next:
+#         # we do not use the next-url, but the original one because we have removed some teams in the meantime
+#         response = session.get(url)
+#         response_dict = response.json()
+#         logger.info(response_dict)
+#
+#         for team in response_dict.get('objects'):
+#             # remove this team from tournament
+#             remove_url='{0}/v1/tournament_teams/{1}/{2}/'.format(settings.HOST,tournament_id,team.get('team_id'))
+#             response = requests.delete(url=remove_url,headers=my_headers,config=my_config)
+#             if response.status_code == 204:
+#                 logger.info('removed team with id {0}'.format(team.get('team_id')))
+#             else:
+#                 response.raise_for_status()
+#
+#         # check if there are more teams
+#         next=response_dict.get('meta').get('next')
+#     return
 
 def api_weblink(tournament_id):
     url='{0}/v1/tournaments/{1}/'.format(settings.HOST,tournament_id)
-    response = requests.get(url=url,headers=my_headers,config=my_config)
-    response_dict = simplejson.loads(response.content)
+    response = session.get(url)
+    response_dict = response.json()
     return response_dict.get('leaguevine_url')
     
 
 def api_newtournament(data_dict):
 # expects a data_dictionary with leaguevine tournament specification
     url='{0}/v1/tournaments/'.format(settings.HOST)
-    response_dict=api_post(url,data_dict)
+    response_dict=api_post(url, data_dict)
 
     tournament_id = response_dict.get('id')
     logger.info('added tournament with id: {0}'.format(tournament_id))
@@ -382,8 +362,8 @@ def api_createteam(season_id,name,info,city,country):
     # first check if team with this name already exists in season_id
     logger.info(name)
     url=u'{0}/v1/teams/?name={1}&season_id={2}'.format(settings.HOST,name,season_id)
-    response=requests.get(url=url,headers=my_headers,config=my_config)
-    response_dict = simplejson.loads(response.content)
+    response=session.get(url)
+    response_dict = response.json()
     if response_dict.get('meta').get('total_count')==0:
         # create a new team in season_id
         url='{0}/v1/teams/'.format(settings.HOST)
@@ -456,14 +436,14 @@ def api_cleanbrackets(tournament_id):
     next=True  
     while next:
         # we do not use the next-url, but the original one because we have removed some teams in the meantime
-        response = requests.get(url=url,headers=my_headers,config=my_config)
-        response_dict = simplejson.loads(response.content)
+        response = session.get(url)
+        response_dict = response.json()
         logger.info(pformat(response_dict))
         
         for bracket in response_dict.get('objects'):
             # remove this team from tournament
             remove_url='{0}/v1/brackets/{1}/'.format(settings.HOST,bracket.get('id'))
-            response = requests.delete(url=remove_url,headers=my_headers,config=my_config)
+            response = session.delete(url=remove_url,headers=my_headers,config=my_config)
             if response.status_code == 204:
                 logger.info('removed bracket with id {0}'.format(bracket.get('id')))
             else:

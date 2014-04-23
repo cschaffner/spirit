@@ -50,22 +50,25 @@ $(document).ready(function()
 <h2>Games</h2>
 <table id="Games" class="tablesorter">
 	<thead>
-	<tr><th>Team 1</th><th>Score</th><th>Team 2</th><th>Team1 rec</th><th>Team2 rec</th></tr>
+	<tr>
+        <th>Date</th>
+        <th>Field</th>
+        <th>Team 1</th>
+        <th>Score</th>
+        <th>Team 2</th>
+        <th>Team1 rec</th>
+        <th>Team2 rec</th>
+    </tr>
 	</thead>
 	{% for g in games %}
-	<tr><td><a href="/team/{{g.team_1_id}}/">{{g.team_1.name}}</a></td>
+	<tr>
+        <td>{{g.start_time}}</td>
+        <td>{{g.field}}</td>
+        <td><a href="/team/{{g.team_1_id}}/">{{g.team_1.name}}</a></td>
 		<td><a href="/game/{{g.id}}/">{{g.team_1_score}} - {{g.team_2_score}}</a></td>
 		<td><a href="/team/{{g.team_2_id}}/">{{g.team_2.name}}</a></td>
-		{% if g.team_1_spirit_editable %}
-			<td><a href="/game/{{g.id}}/submit/2/">{% if g.team_1_spirit %}{{g.team_1_spirit}}{% else %}enter{% endif %}</a></td>
-		{% else %}
-			<td>{{g.team_1_spirit}}</td>
-		{% endif %}
-		{% if g.team_2_spirit_editable %}
+        <td><a href="/game/{{g.id}}/submit/2/">{% if g.team_1_spirit %}{{g.team_1_spirit}}{% else %}enter{% endif %}</a></td>
 		<td><a href="/game/{{g.id}}/submit/1/">{% if g.team_2_spirit %}{{g.team_2_spirit}}{% else %}enter{% endif %}</a></td>
-		{% else %}
-			<td>{{g.team_2_spirit}}</td>
-		{% endif %}
 	</tr>
 	{% endfor %}
 </table>

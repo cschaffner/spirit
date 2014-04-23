@@ -1,28 +1,31 @@
 # Django settings for spirit project.
 import os
+
 ROOT_PATH = os.path.dirname(__file__)
 
 OFFLINE = False
 
-try:
-   from local_settings import *
-except ImportError, e:
-   pass
+# try:
+#     from local_settings import *
+# except ImportError, e:
+#     pass
 
 # allows to switch between the real and the testing leaguevine server
 #HOST="http://api.playwithlv.com"
 HOST="https://api.leaguevine.com"
+# HOST = "http://api.localhost:8000"
+
 
 # expects credentials to be stored in environmental variables!
 ON_HEROKU = False
 if 'ON_HEROKU' in os.environ:
     ON_HEROKU = True
-    DEBUG = os.environ.get('DEBUG', False) # if DEBUG exists on Heroku, use DEBUG mode, otherwise not
+    DEBUG = os.environ.get('DEBUG', False)  # if DEBUG exists on Heroku, use DEBUG mode, otherwise not
 else:
     DEBUG = True
 
 if ON_HEROKU:
-    if HOST=="http://api.playwithlv.com":
+    if HOST == "http://api.playwithlv.com":
         CLIENT_ID = os.environ['CLIENT_ID_PLAYWITHLV']
         CLIENT_PWD = os.environ['CLIENT_PWD_PLAYWITHLV']
         TOKEN_URL = 'http://www.playwithlv.com'
@@ -31,12 +34,26 @@ if ON_HEROKU:
         CLIENT_PWD = os.environ['CLIENT_PWD']
         TOKEN_URL = 'https://www.leaguevine.com'
     REDIRECT_URI = os.environ['REDIRECT_URI']
+    CLIENT_ID = '691cad4da330e02a36539d2f412eb0'
+    CLIENT_PWD = '2ef5a2643216c35efac0500f7752e6'
+else:
+    # these credentials refer to an app which redirects to  http://127.0.0.1:8000/code/
+    # https://www.leaguevine.com/apps/84/
+    CLIENT_ID = 'e41df6413799888cbf02987ebede49'
+    CLIENT_PWD = '6bbbd86bef4b4359d3298ce9112f56'
+    REDIRECT_URI = 'http://127.0.0.1:8000/code/'
 
-if HOST=="http://api.playwithlv.com":
+
+if HOST == "http://api.playwithlv.com":
     TOKEN_URL = 'http://www.playwithlv.com'
+elif HOST == "http://api.localhost:8000":
+    TOKEN_URL = 'http://localhost:8000'
 else:
     TOKEN_URL = 'https://www.leaguevine.com'
-LOGINURL='{0}/oauth2/authorize/?client_id={1}&response_type=code&redirect_uri={2}&scope=universal'.format(TOKEN_URL,CLIENT_ID,REDIRECT_URI)
+
+LOGINURL = '{0}/oauth2/authorize/?client_id={1}&response_type=code&redirect_uri={2}&scope=universal'.format(TOKEN_URL,
+                                                                                                            CLIENT_ID,
+                                                                                                            REDIRECT_URI)
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -49,12 +66,12 @@ MANAGERS = ADMINS
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': '',                      # Or path to database file if using sqlite3.
-        'USER': '',                      # Not used with sqlite3.
-        'PASSWORD': '',                  # Not used with sqlite3.
-        'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+        'ENGINE': 'django.db.backends.',  # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME': '',  # Or path to database file if using sqlite3.
+        'USER': '',  # Not used with sqlite3.
+        'PASSWORD': '',  # Not used with sqlite3.
+        'HOST': '',  # Set to empty string for localhost. Not used with sqlite3.
+        'PORT': '',  # Set to empty string for default. Not used with sqlite3.
     }
 }
 
@@ -112,7 +129,7 @@ STATICFILES_DIRS = (
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-#    'django.contrib.staticfiles.finders.DefaultStorageFinder',
+    #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
 # Make this unique, and don't share it with anybody.
@@ -122,7 +139,7 @@ SECRET_KEY = 'e^+fnmfdajh)bx#63@em02*ezm75!4_-@eqe^#-@uy-quki*h&amp;'
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
-#     'django.template.loaders.eggs.Loader',
+    #     'django.template.loaders.eggs.Loader',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -181,12 +198,12 @@ LOGGING = {
     },
     'handlers': {
         'null': {
-            'level':'DEBUG',
-            'class':'django.utils.log.NullHandler',
+            'level': 'DEBUG',
+            'class': 'django.utils.log.NullHandler',
         },
-        'console':{
-            'level':'WARNING',
-            'class':'logging.StreamHandler',
+        'console': {
+            'level': 'WARNING',
+            'class': 'logging.StreamHandler',
             'formatter': 'simple'
         },
         'mail_admins': {
