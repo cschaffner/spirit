@@ -1,6 +1,7 @@
 from __future__ import division
 from django.shortcuts import render_to_response, get_object_or_404, redirect, render
 from django.http import HttpResponseRedirect
+from django.utils.dateparse import parse_datetime
 
 from forms import SpiritForm
 from wrapper import *
@@ -53,6 +54,7 @@ def team(request, team_id):
 
     game_ids = []
     for g in games['objects']:
+        g['datetime'] = parse_datetime(g['start_time'])
         # make a list of game_ids so that all those spirit scores can be retrieved later in one query
         game_ids.append(g['id'])
         # figure out which is my team, which is the opponent
@@ -134,6 +136,7 @@ def season(request, season_id):
     user_first_name = request.session.get('first_name', None)
     user_teamids = request.session.get('user_teamids', [])
     for g in games['objects']:
+        g['datetime'] = parse_datetime(g['start_time'])
         g['team_1_spirit_editable'] = g['team_2_id'] in user_teamids
         g['team_2_spirit_editable'] = g['team_1_id'] in user_teamids
 
@@ -160,6 +163,7 @@ def tournament(request, tournament_id):
     user_first_name = request.session.get('first_name', None)
     user_teamids = request.session.get('user_teamids', [])
     for g in games['objects']:
+        g['datetime'] = parse_datetime(g['start_time'])
         g['team_1_spirit_editable'] = g['team_2_id'] in user_teamids
         g['team_2_spirit_editable'] = g['team_1_id'] in user_teamids
 
