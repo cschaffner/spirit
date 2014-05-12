@@ -1,16 +1,6 @@
 {% extends "base.html" %}
 
 {% block content %}
-<script type="text/javascript" src="/static/jscript/jquery-latest.js"></script>
-<script type="text/javascript" src="/static/jscript/jquery.tablesorter.js"></script>
-
-<script type="text/javascript">
-$(document).ready(function()
-	{
-		$("#Teams").tablesorter( {sortList: [[0,0], [1,0]]} );
-		$("#Games").tablesorter( {sortList: [[0,0], [1,0]]} );
-	}
-);</script>
 
 {% block title %}{% endblock title %}
 
@@ -21,7 +11,7 @@ $(document).ready(function()
 </div> -->
 
 <h2>Teams</h2>
-<table id="Teams" class="tablesorter">
+<table id="table-teams" class="table tablesorter">
 	<thead>
 	<tr>
 		<th>Teams</th>
@@ -48,7 +38,7 @@ $(document).ready(function()
 </table>
 
 <h2>Games</h2>
-<table id="Games" class="tablesorter">
+<table id="table-games" class="table tablesorter">
 	<thead>
 	<tr>
         <th>Date</th>
@@ -62,16 +52,28 @@ $(document).ready(function()
 	</thead>
 	{% for g in games %}
 	<tr>
-        <td>{{g.datetime|date:"D d M Y, H:i"}}</td>
-        <td>{{g.game_site.name}}</td>
-        <td><a href="/team/{{g.team_1_id}}/">{{g.team_1.name}}</a></td>
+    <td>{{g.datetime|date:"D d M Y, H:i"}}</td>
+    <td>{{g.game_site.name}}</td>
+    <td><a href="/team/{{g.team_1_id}}/">{{g.team_1.name}}</a></td>
 		<td><a href="/game/{{g.id}}/">{{g.team_1_score}} - {{g.team_2_score}}</a></td>
 		<td><a href="/team/{{g.team_2_id}}/">{{g.team_2.name}}</a></td>
-        <td><a href="/game/{{g.id}}/submit/2/">{% if g.team_1_spirit %}{{g.team_1_spirit}}{% else %}enter{% endif %}</a></td>
-		<td><a href="/game/{{g.id}}/submit/1/">{% if g.team_2_spirit %}{{g.team_2_spirit}}{% else %}enter{% endif %}</a></td>
+    <td><a href="/game/{{g.id}}/submit/2/" class="btn btn-default">{% if g.team_1_spirit %}{{g.team_1_spirit}}{% else %}enter{% endif %}</a></td>
+		<td><a href="/game/{{g.id}}/submit/1/" class="btn btn-default">{% if g.team_2_spirit %}{{g.team_2_spirit}}{% else %}enter{% endif %}</a></td>
 	</tr>
 	{% endfor %}
 </table>
 
 
 {% endblock content %}
+
+
+{% block post %}
+  {{ block.super }}
+  <script type="text/javascript" src="/static/jscript/jquery.tablesorter.js"></script>
+  <script type="text/javascript">
+    $(function() {
+		  $("#table-teams").tablesorter( {sortList: [[0,0], [1,0]]} );
+		  $("#table-games").tablesorter( {sortList: [[0,0], [1,0]]} );
+    });
+  </script>
+{% endblock %}

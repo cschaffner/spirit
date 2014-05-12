@@ -1,24 +1,48 @@
 {% extends "base.html" %}
+{% load bootstrap %}
+
 
 {% block content %}
-<h1>Spirit score entry for game {{game.id}}</h1>
+  <style type="text/css">
+    .form-group {
+      width: 50%;
+      float: left;
+      overflow: hidden;
+    }
+  </style>
+  <div class="row">
+    <div class="col-md-8">
+      <h2><span class="label label-primary">{{team_giving_name}}</span> gives <span class="label label-info">{{team_receiving_name}}</span></h2>
+      <br />
+      <form action="/game/{{game.id}}/submit/{{team_giving}}/" method="post">{% csrf_token %}
+        {{ form|bootstrap }}
+        <input type="submit" value="Submit" class="btn btn-primary btn-lg" />
+      </form>
 
-<div>Back to <a href="/game/{{game.id}}/">game</a></div>
-Teams: {{game.team_1.name}} - {{game.team_2.name}}<br>
-Score: {{game.team_1_score}} - {{game.team_2_score}}<br>
-Time: {{game.start_time}}<br>
-Tournament: {{game.tournament.name}}<br>
-Season: {{game.season.name}}<br>
-League: {{game.season.league.name}}<br>
-<br>
-Team {{team_giving_name}} gives the following spirit scores to
-Team {{team_receiving_name}}<br>
+    </div>
 
-<form action="/game/{{game.id}}/submit/{{team_giving}}/" method="post">{% csrf_token %}
-{{ form.as_p }}
-<input type="submit" value="Submit" />
-</form>
+    <div class="col-md-4">
+      <h3>Spirit score entry for game {{game.id}}</h3>
+      <p>
+        <a href="/game/{{game.id}}/" class="btn btn-default">back</a>
+      </p>
 
-<!-- 
-<img src="/static/spirit_form.png"></img> -->
+      Teams: {{game.team_1.name}} - {{game.team_2.name}}<br>
+      Score: {{game.team_1_score}} - {{game.team_2_score}}<br>
+      Time: {{game.start_time}}<br>
+      Tournament: {{game.tournament.name}}<br>
+      Season: {{game.season.name}}<br>
+      League: {{game.season.league.name}}<br>
+
+    </div>
+
+  </div>
+
+
+
+
+
+
+
+  <br /><br />
 {% endblock content %}
