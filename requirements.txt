@@ -1,4 +1,4 @@
-Django==1.6.3
+Django==1.6.5
 distribute==0.7.3
 gunicorn==0.17.2
 requests==2.2.1
