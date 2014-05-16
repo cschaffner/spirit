@@ -1,27 +1,45 @@
 {% extends "base.html" %}
 
 {% block content %}
+
 <h1>Team page of {{team.name}}</h1>
-<div>Season: {{team.season.name}}, {{team.season.league.name}}</div>
+<h6>Season: {{team.season.name}}, {{team.season.league.name}}</h6>
+
+<hr />
 
 <h2>Previous Games:</h2>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Field</th>
+      <th>Time</th>
+      <th>Opponent</th>
+      <th>Result</th>
+      <th>Given</th>
+      <th>Received</th>
+      <th>&nbsp;</th>
+      <th>&nbsp;</th>
+    </tr>
+  </thead>
+  <tbody>
 {% for g in games %}
-<div>Tournament: <a href="/tournament/{{g.tournament.id}}/">{{g.tournament.name}}</a></div>
-<div>Field: {{g.game_site.name}}</div>
-<div>Time: {{g.datetime|date:"D d M Y, H:i"}}</div>
-<div>Opponent: <a href="/team/{{g.opp_id}}/">{{g.opp.name}}</a></div>
-<div>Result: <a href="/game/{{g.id}}/">{{g.score_string}}</a></div>
-<div>Spirit score {{ team.name }} gives to {{g.opp.name}}:
-    <a href="/game/{{g.id}}/submit/{{g.my_team}}/">
-    {% if g.spirit_given %}{{g.spirit_given}}{% else %}submit spirit score{% endif %}
-    </a>
-</div>
-<div>Spirit score {{ team.name }} receives from {{g.opp.name}}:
-	<a href="/game/{{g.id}}/submit/{{g.opp_team}}/">
-	{% if g.spirit_received %}{{g.spirit_received}}{% else %}submit spirit score{% endif %}</div>
-	</a>
-<br><br>
+  <tr>
+    <td>{{g.game_site.name}}</td>
+    <td>{{g.datetime|date:"D d H:i"}}</td>
+    <td><a href="/team/{{g.opp_id}}/">{{g.opp.name}}</a></td>
+    <td><a href="/game/{{g.id}}/">{{g.score_string}}</a></td>
+    <td{% if not g.spirit_given %} class="danger"{% endif %}>{% if g.spirit_given %}{{g.spirit_given}}{% else %}&nbsp;{% endif %}</td>
+    <td{% if not g.spirit_received %} class="danger"{% endif %}>{% if g.spirit_received %}{{g.spirit_received}}{% else %}&nbsp;{% endif %}</td>
+    <td>
+      <a href="/game/{{g.id}}/submit/{{g.my_team}}/" class="btn btn-success ww-tooltip" title="give to {{g.opp.name}}">give</a>
+      <a href="/game/{{g.id}}/submit/{{g.opp_team}}/" class="btn btn-info ww-tooltip" title="receive from {{g.opp.name}}">receive</a>
+    </td>
+    <td><a href="/tournament/{{g.tournament.id}}/" title="{{g.tournament.name}}"><i class="fa fa-dot-circle-o"></i></a></td>
+  </tr>
 {% endfor %}
+  </tbody>
+</table>
 
 <!-- 
 Previous games:
@@ -34,3 +52,10 @@ Spirit score you give to Freespeed:  2 + 2 + 0 + 2 + 1 = 7      or    submit sco
 Spirit score you received from Freespeed: 2 + 2 + 2 + 2 + 2 = 10     or   no score yet -->
 
 {% endblock content %}
+
+
+{% block post %}
+  {{ block.super }}
+
+
+{% endblock %}

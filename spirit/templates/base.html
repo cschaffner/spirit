@@ -1,27 +1,83 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
-   "http://www.w3.org/TR/html4/strict.dtd">
+{% load staticfiles %}
+<!doctype html>
+<!--[if lt IE 7 ]>
+<html class="ie ie6" lang="en"> <![endif]-->
+<!--[if IE 7 ]>
+<html class="ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]>
+<html class="ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!-->
+<html lang="en"> <!--<![endif]-->
+<head xmlns:fb="http://www.facebook.com/2008/fbml" xmlns:og="http://opengraphprotocol.org/schema/">
+  <meta charset="utf-8"/>
+  <title>Spirit scores</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, minimal-ui" />
 
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
-	
-<head>
-	<title>Leaguevine - Spirit Score Admnistration</title>
-	<link rel="stylesheet" href="/static/css/blue.css" type="text/css" id="" media="print, projection, screen" />
+  <link rel="stylesheet" href="{% static "components/bootstrap/dist/css/bootstrap.min.css" %}" />
+  <link rel="stylesheet" href="{% static "components/bootstrap/dist/css/bootstrap-theme.min.css" %}" />
+  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" />
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/tooltipster/3.0.5/css/tooltipster.min.css" />
+
 </head>
 
+
+
 <body>
-    <div id="content">
-    	<!-- <p><i>All scores displayed are <b>not</b> actual scores, we are just testing for now!</i></p> -->
-    	{% block user %}
-	    	<p><div>
-			{% if first_name %}
-			Welcome, <a href="/">{{first_name}}</a>. <a href="/logout/">logout</a>
-			{% else %}
-			In order to edit spirit scores, you need to <a href="/login/">log in</a>.
-			{% endif %}
-			</div>
-			</p>
-		{% endblock %}
-        {% block content %}{% endblock %}
+
+<nav class="navbar navbar-default" role="navigation">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="/">Windmill</a>
     </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li>
+          {% block user %}
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ first_name }} <b class="caret"></b></a>
+            <ul class="dropdown-menu">
+              <li>{% if first_name %}
+                <a href="/logout/">logout</a>
+              {% else %}
+                <a href="/login/">log in</a>
+              {% endif %}
+              </li>
+            </ul>
+          {% endblock %}
+        </li>
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+
+    <div class="container">
+
+
+
+
+
+      {% block content %}{% endblock %}
+
+    </div>
+
+  {% block post %}
+    <script type="text/javascript" src="{% static "components/jquery/dist/jquery.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "components/bootstrap/dist/js/bootstrap.min.js" %}"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/tooltipster/3.0.5/js/jquery.tooltipster.min.js"></script>
+
+    <script type="text/javascript">
+      $(function() {
+        $('.ww-tooltip').tooltipster();
+      });
+    </script>
+  {% endblock %}
 </body>
 </html>	
