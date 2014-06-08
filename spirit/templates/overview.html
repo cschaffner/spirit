@@ -25,7 +25,7 @@
 	</thead>
 	<tbody>
 	{% for id,t in teams.iteritems %}
-	<tr><td>{{t.name}}</td>
+	<tr><td><a href="/team/{{ t.id }}/">{{t.name}}</a></td>
 		<td>{{t.avg_received}}</td>
 		<td>{{t.avg_received_total|floatformat}}</td>
 		<td>{{t.nr_received}}</td>

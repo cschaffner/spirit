@@ -26,7 +26,7 @@
 {% for g in games %}
   <tr>
     <td>{{g.game_site.name}}</td>
-    <td>{{g.datetime|date:"D d H:i"}}</td>
+    <td><a href="/team/{{ team.id }}/{{ g.datetime|date:"Y-m-d" }}/">{{g.datetime|date:"D d H:i"}}<a></a></td>
     <td><a href="/team/{{g.opp_id}}/">{{g.opp.name}}</a></td>
     <td><a href="/game/{{g.id}}/">{{g.score_string}}</a></td>
     <td{% if not g.spirit_given %} class="danger"{% endif %}>{% if g.spirit_given %}{{g.spirit_given}}{% else %}&nbsp;{% endif %}</td>

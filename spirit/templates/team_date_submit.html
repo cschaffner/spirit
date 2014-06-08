@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% load bootstrap %}
+
+
+{% block content %}
+  <style type="text/css">
+    .form-group {
+      width: 50%;
+      float: left;
+      overflow: hidden;
+    }
+  </style>
+  <div class="row">
+    <div class="col-md-8">
+      <h2><a href="/team/{{ team.id }}/" class="label label-primary">{{team.name}}</a></h2>
+      <br />
+        <form method="post" action="/team/{{ team.id }}/{{ year }}-{{ month }}-{{ day }}/">
+            {% csrf_token %}
+            {{ formset.management_form }}
+                {% for form in formset %}
+                    <div class="col-md-12">
+                    {{ form|bootstrap }}
+                    <br /><br />
+                    </div>
+                {% endfor %}
+            <input type="submit" value="Submit" class="btn btn-primary btn-lg" />
+        </form>
+{#          <form action="/game/{{game.id}}/submit/{{team_giving}}/" method="post">{% csrf_token %}#}
+{#            {{ form|bootstrap }}#}
+{#            <input type="submit" value="Submit" class="btn btn-primary btn-lg" />#}
+{#          </form>#}
+    </div>
+
+    <div class="col-md-4">
+      <h3>Spirit score entry for game {{game.id}}</h3>
+      <p>
+        <a href="/game/{{game.id}}/" class="btn btn-default">back</a>
+      </p>
+
+      Teams: {{game.team_1.name}} - {{game.team_2.name}}<br>
+      Score: {{game.team_1_score}} - {{game.team_2_score}}<br>
+      Time: {{game.start_time}}<br>
+      Tournament: {{game.tournament.name}}<br>
+      Season: {{game.season.name}}<br>
+      League: {{game.season.league.name}}<br>
+
+    </div>
+
+  </div>
+
+
+
+
+
+
+
+  <br /><br />
+{% endblock content %}

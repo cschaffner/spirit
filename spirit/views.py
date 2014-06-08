@@ -2,7 +2,9 @@ from __future__ import division
 from django.shortcuts import render_to_response, get_object_or_404, redirect, render
 from django.http import HttpResponseRedirect
 from django.utils.dateparse import parse_datetime
+from django.forms.formsets import formset_factory
 
+from operator import itemgetter
 from forms import SpiritForm
 from wrapper import *
 from pprint import pformat
@@ -48,6 +50,9 @@ def code(request):
 def team(request, team_id):
     t = api_teambyid(team_id)
     games = api_gamesbyteam(team_id)
+    # remove BYE games, as those are irrelavant for spirit scores:
+    games['objects'] = [g for g in games['objects'] if g['team_2_id']]
+
     user_id = request.session.get('user_id', None)
     user_first_name = request.session.get('first_name', None)
     user_teamids = request.session.get('user_teamids', [])
@@ -109,6 +114,106 @@ def team(request, team_id):
                                             'games': games['objects'],
                                             'first_name': user_first_name})
 
+def team_date(request, team_id, year, month, day):
+    team = api_teambyid(team_id)
+    all_games = api_gamesbyteam(team_id)
+    # remove BYE games, as those are irrelavant for spirit scores:
+    all_games['objects'] = [g for g in all_games['objects'] if g['team_2_id']]
+
+    # filter games on particular date
+    games = []
+    for game in all_games['objects']:
+        game['datetime'] = parse_datetime(game['start_time'])
+        if (game['datetime'].day == int(day) and game['datetime'].month == int(month) and game['datetime'].year == int(year)):
+            if int(game['team_1_id']) == int(team['id']):
+                game['my_team'] = 1
+            elif int(game['team_2_id']) == int(team['id']):
+                game['my_team'] = 2
+            else:
+                raise Exception('team {0} should be one of the two teams in game {1}'.format(team['name'], game['id']))
+            games.append(game)
+
+    # sort games according to start time
+    games = sorted(games, key=itemgetter('datetime'))
+
+    user_id = request.session.get('user_id', None)
+    user_first_name = request.session.get('first_name', None)
+    user_teamids = request.session.get('user_teamids', [])
+
+    if not user_id:
+        return render_to_response('error.html', {'error': 'You have to log in to edit spirit scores.'})
+
+
+    SpiritFormSet = formset_factory(SpiritForm, extra=len(games))
+
+    if request.method == 'POST':  # If the form has been submitted...
+        formset = SpiritFormSet(request.POST)  # A form bound to the POST data
+        if formset.is_valid():  # All validation rules pass
+            # Processing the data in form.cleaned_data
+            for form, game in zip(formset, games):
+                # logger.info(pformat(form.cleaned_data))
+                scores = [form.cleaned_data['spirit_rules'], form.cleaned_data['spirit_fouls'],
+                          form.cleaned_data['spirit_fair'], form.cleaned_data['spirit_attitude'],
+                          form.cleaned_data['spirit_communication']]
+                data = {'team_1_id': game['team_1_id'],
+                        'team_2_id': game['team_2_id']}
+                if game['my_team'] == 1:
+                    data['team_2_score'] = scores
+                    data['team_2_comment'] = form.cleaned_data['spirit_comment']
+                else:
+                    data['team_1_score'] = scores
+                    data['team_1_comment'] = form.cleaned_data['spirit_comment']
+                logger.info(api_addspirit(game['id'], data))
+
+            return HttpResponseRedirect('/team/{0}/'.format(team['id']))  # Redirect after POST
+    else:
+        formset = SpiritFormSet()  # Unbound forms
+        for form, game in zip(formset, games):
+            form.fields['game_start'].initial = game['datetime']
+            form.fields['occasion'].initial = game['tournament']['name']
+            if game['my_team'] == 1:
+                form.fields['opponent_name'].initial = game['team_2']['name']
+            else:
+                form.fields['opponent_name'].initial = game['team_1']['name']
+            form.fields['opponent_name'].disabled = True
+
+            spirit = api_spiritbygame(game['id'])
+            if spirit['meta']['total_count'] > 0:
+                # spirit scores are sorted according to time_last_updated
+                # so we go through the list and take the first one that matches
+                team_1_scores = []
+                team_2_scores = []
+                for score in spirit['objects']:
+                    if game['my_team'] == 1:
+                        if score['team_2_score'] != u'' and team_2_scores == []:
+                            team_2_scores = json.loads(score['team_2_score'])
+                            form.fields['spirit_rules'].initial = team_2_scores[0]
+                            form.fields['spirit_fouls'].initial = team_2_scores[1]
+                            form.fields['spirit_fair'].initial = team_2_scores[2]
+                            form.fields['spirit_attitude'].initial = team_2_scores[3]
+                            form.fields['spirit_communication'].initial = team_2_scores[4]
+                            form.fields['spirit_comment'].initial = score['team_2_comment']
+                    elif game['my_team'] == 2:
+                        if score['team_1_score'] != u'' and team_1_scores == []:
+                            team_1_scores = json.loads(score['team_1_score'])
+                            form.fields['spirit_rules'].initial = team_1_scores[0]
+                            form.fields['spirit_fouls'].initial = team_1_scores[1]
+                            form.fields['spirit_fair'].initial = team_1_scores[2]
+                            form.fields['spirit_attitude'].initial = team_1_scores[3]
+                            form.fields['spirit_communication'].initial = team_1_scores[4]
+                            form.fields['spirit_comment'].initial = score['team_1_comment']
+
+
+    return render(request, 'team_date_submit.html', {
+        'formset': formset,
+        'team': team,
+        'year': year,
+        'month': month,
+        'day': day,
+    })
+
+
+
 
 def score_string(my_score, opp_score):
     # returns a string like "W 12-8" or "L 4-15" or "T 5-5"
@@ -126,6 +231,9 @@ def season(request, season_id):
     # retrieve all games of this season
     spirit = api_spiritbyseason(season_id)
     games = api_gamesbyseason(season_id)
+    # remove BYE games, as those are irrelevant for spirit scores:
+    games['objects'] = [g for g in games['objects'] if g['team_2_id']]
+
     logger.info(pformat(spirit))
 
     if (u'errors' in spirit):
@@ -154,6 +262,9 @@ def tournament(request, tournament_id):
     # retrieve all games of this tournament
     spirit = api_spiritbytournament(tournament_id)
     games = api_gamesbytournament(tournament_id)
+    # remove BYE games, as those are irrelevant for spirit scores:
+    games['objects'] = [g for g in games['objects'] if g['team_2_id']]
+
 
     if (u'errors' in spirit):
         errmsg = '{0}'.format(spirit['errors'])
@@ -258,6 +369,14 @@ def game_submit(request, game_id, team_giving):
             return HttpResponseRedirect('/game/{0}/'.format(game_id))  # Redirect after POST
     else:
         form = SpiritForm()  # An unbound form
+        game['datetime'] = parse_datetime(game['start_time'])
+        form.fields['game_start'].initial = game['datetime']
+        form.fields['occasion'].initial = game['tournament']['name']
+        if team_giving == u'1':
+            form.fields['opponent_name'].initial = game['team_2']['name']
+        elif team_giving == u'2':
+            form.fields['opponent_name'].initial = game['team_1']['name']
+
         spirit = api_spiritbygame(game_id)
         if spirit['meta']['total_count'] > 0:
             # spirit scores are sorted according to time_last_updated
@@ -371,6 +490,7 @@ def TeamsFromGames(spirit, games):
             teams[id]['avg_received'] = map(lambda x: sum(x) / teams[id]['nr_received'],
                                             zip(*team['received'].values()))
             teams[id]['avg_received_total'] = sum(teams[id]['avg_received'])
+            teams[id]['avg_received'] = map(lambda x: round(x,2), teams[id]['avg_received'])
         if teams[id]['nr_given'] > 0:
             teams[id]['avg_given'] = map(lambda x: sum(x) / teams[id]['nr_given'], zip(*team['given'].values()))
             teams[id]['avg_given_total'] = sum(teams[id]['avg_given'])

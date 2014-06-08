@@ -10,10 +10,13 @@ OFFLINE = False
 # except ImportError, e:
 #     pass
 
+
 # allows to switch between the real and the testing leaguevine server
 #HOST="http://api.playwithlv.com"
 HOST="https://api.leaguevine.com"
 # HOST = "http://api.localhost:8000"
+
+
 
 
 # expects credentials to be stored in environmental variables!
@@ -191,7 +194,10 @@ LOGGING = {
     'disable_existing_loggers': False,
     'formatters': {
         'verbose': {
-            'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+            'format': ('%(asctime)s [%(process)d] [%(levelname)s] ' +
+                       'pathname=%(pathname)s lineno=%(lineno)s ' +
+                       'funcname=%(funcName)s %(message)s'),
+            'datefmt': '%Y-%m-%d %H:%M:%S'
         },
         'simple': {
             'format': '%(levelname)s %(message)s'
@@ -203,9 +209,9 @@ LOGGING = {
             'class': 'django.utils.log.NullHandler',
         },
         'console': {
-            'level': 'WARNING',
+            'level': 'INFO',
             'class': 'logging.StreamHandler',
-            'formatter': 'simple'
+            'formatter': 'verbose'
         },
         'mail_admins': {
             'level': 'ERROR',
@@ -219,8 +225,8 @@ LOGGING = {
             'propagate': True,
         },
         'spirit': {
-            'handlers': ['console', 'mail_admins'],
-            'level': 'INFO',
+            'handlers': ['console'],
+            'level': 'DEBUG',
         },
 
     }
