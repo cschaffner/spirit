@@ -171,6 +171,9 @@ def team_date(request, team_id, year, month, day):
         for form, game in zip(formset, games):
             form.fields['game_start'].initial = game['datetime']
             form.fields['occasion'].initial = game['tournament']['name']
+            if game['swiss_round_id']:
+                form.fields['occasion'].initial += ', Swissround {0}'.format(game['swiss_round']['round_number'])
+
             if game['my_team'] == 1:
                 form.fields['opponent_name'].initial = game['team_2']['name']
             else:
@@ -328,7 +331,7 @@ def game(request, game_id):
                                             'game': game, 'spirit': spirit})
 
 
-def game_submit(request, game_id, team_giving):
+def game_submit(request, game_id, team_idx_giving):
     # retrieve this game
     game = api_gamebyid(game_id);
 
@@ -342,9 +345,9 @@ def game_submit(request, game_id, team_giving):
         return render_to_response('error.html', {'error': 'You have to log in to edit spirit scores.'})
 
     # user_team_ids=request.session.get('user_teamids',None)
-    # if (team_giving == u'1' and not game['team_1_id'] in user_team_ids):
+    # if (team_idx_giving == u'1' and not game['team_1_id'] in user_team_ids):
     #     return render_to_response('error.html', {'error': 'You have to be a member of team {0} in order to submit this spirit score (and you are not).'.format(game['team_1']['name'])})
-    # if (team_giving == u'2' and not game['team_2_id'] in user_team_ids):
+    # if (team_idx_giving == u'2' and not game['team_2_id'] in user_team_ids):
     #     return render_to_response('error.html', {'error': 'You have to be a member of team {0} in order to submit this spirit score (and you are not).'.format(game['team_2']['name'])})
 
     if request.method == 'POST':  # If the form has been submitted...
@@ -358,10 +361,10 @@ def game_submit(request, game_id, team_giving):
                       form.cleaned_data['spirit_communication']]
             data = {'team_1_id': game['team_1_id'],
                     'team_2_id': game['team_2_id']}
-            if team_giving == u'1':
+            if team_idx_giving == u'1':
                 data['team_2_score'] = scores
                 data['team_2_comment'] = form.cleaned_data['spirit_comment']
-            elif team_giving == u'2':
+            elif team_idx_giving == u'2':
                 data['team_1_score'] = scores
                 data['team_1_comment'] = form.cleaned_data['spirit_comment']
             logger.info(api_addspirit(game['id'], data))
@@ -372,9 +375,11 @@ def game_submit(request, game_id, team_giving):
         game['datetime'] = parse_datetime(game['start_time'])
         form.fields['game_start'].initial = game['datetime']
         form.fields['occasion'].initial = game['tournament']['name']
-        if team_giving == u'1':
+        if game['swiss_round_id']:
+            form.fields['occasion'].initial += ', Swissround {0}'.format(game['swiss_round']['round_number'])
+        if team_idx_giving == u'1':
             form.fields['opponent_name'].initial = game['team_2']['name']
-        elif team_giving == u'2':
+        elif team_idx_giving == u'2':
             form.fields['opponent_name'].initial = game['team_1']['name']
 
         spirit = api_spiritbygame(game_id)
@@ -384,7 +389,7 @@ def game_submit(request, game_id, team_giving):
             team_1_scores = []
             team_2_scores = []
             for score in spirit['objects']:
-                if team_giving == u'1':
+                if team_idx_giving == u'1':
                     if score['team_2_score'] != u'' and team_2_scores == []:
                         team_2_scores = json.loads(score['team_2_score'])
                         form.fields['spirit_rules'].initial = team_2_scores[0]
@@ -393,7 +398,7 @@ def game_submit(request, game_id, team_giving):
                         form.fields['spirit_attitude'].initial = team_2_scores[3]
                         form.fields['spirit_communication'].initial = team_2_scores[4]
                         form.fields['spirit_comment'].initial = score['team_2_comment']
-                elif team_giving == u'2':
+                elif team_idx_giving == u'2':
                     if score['team_1_score'] != u'' and team_1_scores == []:
                         team_1_scores = json.loads(score['team_1_score'])
                         form.fields['spirit_rules'].initial = team_1_scores[0]
@@ -405,18 +410,18 @@ def game_submit(request, game_id, team_giving):
 
                     #            form.fields['team_giving'].choices=((1,game['team_1']['name']),(2,game['team_2']['name']))
 
-    if team_giving == u'1':
-        team_giving_name = game['team_1']['name']
-        team_receiving_name = game['team_2']['name']
-    elif team_giving == u'2':
-        team_giving_name = game['team_2']['name']
-        team_receiving_name = game['team_1']['name']
+    if team_idx_giving == u'1':
+        team_giving = game['team_1']
+        team_receiving = game['team_2']
+    elif team_idx_giving == u'2':
+        team_giving = game['team_2']
+        team_receiving = game['team_1']
     return render(request, 'game_submit.html', {
         'form': form,
         'game': game,
         'team_giving': team_giving,
-        'team_giving_name': team_giving_name,
-        'team_receiving_name': team_receiving_name
+        'team_idx_giving': team_idx_giving,
+        'team_receiving': team_receiving
     })
 
 

@@ -12,9 +12,10 @@
   </style>
   <div class="row">
     <div class="col-md-8">
-      <h2><span class="label label-primary">{{team_giving_name}}</span> gives <span class="label label-info">{{team_receiving_name}}</span></h2>
+      <h2><a href="/team/{{ team_giving.id }}/" class="label label-primary">{{team_giving.name}}</a> gives
+          <a href="/team/{{ team_receiving.id }}/" class="label label-info">{{team_receiving.name}}</a></h2>
       <br />
-      <form action="/game/{{game.id}}/submit/{{team_giving}}/" method="post">{% csrf_token %}
+      <form action="/game/{{game.id}}/submit/{{team_idx_giving}}/" method="post">{% csrf_token %}
         {{ form|bootstrap }}
         <input type="submit" value="Submit" class="btn btn-primary btn-lg" />
       </form>
