@@ -446,10 +446,12 @@ def TeamsFromGames(spirit, games):
         if score['team_1_id'] != None and score['team_2_id'] != None:
             if not score['team_1_id'] in teams:
                 teams[score['team_1_id']] = {'name': score['team_1']['name'],
+                                             'id': score['team_1_id'],
                                              'received': {},
                                              'given': {}}
             if not score['team_2_id'] in teams:
                 teams[score['team_2_id']] = {'name': score['team_2']['name'],
+                                             'id': score['team_2_id'],
                                              'received': {},
                                              'given': {}}
             if score['team_1_score'] != u'':
@@ -499,6 +501,7 @@ def TeamsFromGames(spirit, games):
         if teams[id]['nr_given'] > 0:
             teams[id]['avg_given'] = map(lambda x: sum(x) / teams[id]['nr_given'], zip(*team['given'].values()))
             teams[id]['avg_given_total'] = sum(teams[id]['avg_given'])
+            teams[id]['avg_given'] = map(lambda x: round(x,2), teams[id]['avg_given'])
     logger.info(pformat(teams))
     return teams, games
 
