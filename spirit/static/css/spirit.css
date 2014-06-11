@@ -1,0 +1,44 @@
+
+
+div.radio-new {
+  width: 40px;
+  height: 40px;
+  float: left;
+  margin-right: 2px;
+}
+
+div.form-group {
+  overflow: hidden;
+  display: block;
+}
+
+.radio.radio, .checkbox.checkbox {
+margin-top: -5px;
+}
+
+a.ar {
+  display: block;
+  background-color: #ececec;
+  text-align: center;
+  color: #000;
+  font-weight: bold;
+  width: 40px;
+  padding: 3px 0 3px 0;
+}
+
+a.ar.active {
+  background-color: #000;
+  color: #fff;
+}
+
+.col-md-3 .form-group:first-child input{
+  font-weight: bold;
+  color: #428BCA;
+}
+
+input[type=number] {
+  font-weight: bold;
+  text-align: center;
+  font-size: 32px;
+  height: 60px;
+}

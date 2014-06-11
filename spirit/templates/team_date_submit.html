@@ -1,36 +1,35 @@
 {% extends "base.html" %}
-{% load bootstrap %}
+{% load bootstrap static %}
 
+{% block headercss %}
+  <link rel="stylesheet" href="{% static "css/spirit.css" %}" />
+{% endblock %}
 
 {% block content %}
-  <style type="text/css">
-    .form-group {
-      width: 50%;
-      float: left;
-      overflow: hidden;
-    }
-  </style>
+
   <div class="row">
-    <div class="col-md-8">
+    <div class="col-md-12">
       <h2><a href="/team/{{ team.id }}/" class="label label-primary">{{team.name}}</a></h2>
       <br />
         <form method="post" action="/team/{{ team.id }}/{{ year }}-{{ month }}-{{ day }}/">
             {% csrf_token %}
+            <div class="row">
             {{ formset.management_form }}
                 {% for form in formset %}
-                    <div class="col-md-12">
+                    <div class="col-md-3">
                     {{ form|bootstrap }}
-                    <br /><br />
                     </div>
                 {% endfor %}
+            </div>
             <input type="submit" value="Submit" class="btn btn-primary btn-lg" />
         </form>
-{#          <form action="/game/{{game.id}}/submit/{{team_giving}}/" method="post">{% csrf_token %}#}
-{#            {{ form|bootstrap }}#}
-{#            <input type="submit" value="Submit" class="btn btn-primary btn-lg" />#}
-{#          </form>#}
-    </div>
 
+    </div>
+  </div>
+
+
+
+  <div class="row">
     <div class="col-md-4">
       <h3>Spirit score entry for game {{game.id}}</h3>
       <p>
@@ -56,3 +55,53 @@
 
   <br /><br />
 {% endblock content %}
+
+{% block post %}
+  {{ block.super }}
+  <script type="text/javascript">
+    $(function() {
+      $("div.radio").each(function() {
+        buildRadio($(this));
+      });
+
+      updateScores();
+    });
+
+
+  function buildRadio(o) {
+    o.find('label').hide();
+    o.removeClass('radio').addClass('radio-new');
+    var input = o.find('input');
+    var a = $("<a class='ar' href='#'>" + input.val() + "</a>");
+
+    if(input.prop('checked')) {
+      a.addClass('active');
+    }
+    a.click(function(e){
+      e.preventDefault();
+      var parent = o.parent();
+      parent.find('input').prop('checked', false);
+      parent.find('a').removeClass('active');
+      input.prop('checked', true);
+      a.addClass('active');
+      updateScores();
+    });
+
+    o.append(a);
+
+  }
+
+
+  function updateScores() {
+    $('input[type=number]').each(function() {
+      var input = $(this);
+      var formset = input.parentsUntil('.row');
+      var val = 0;
+      formset.find('.radio-new input[type=radio]:checked').each(function() {
+        val += parseInt($(this).val());
+      });
+      input.val(val);
+    });
+  }
+  </script>
+{% endblock %}
