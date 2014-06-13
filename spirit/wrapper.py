@@ -37,9 +37,11 @@ session.headers.update({'Authorization': 'bearer {0}'.format(access_token),
                   'Content-Type': 'application/json',
                   'Accept': 'application/json'})
 
-def api_token_from_code(request,code):
+def api_token_from_code(request, code):
     global my_headers
-    
+
+
+
     url=u'{0}/oauth2/token/?client_id={1}&client_secret={2}&code={3}&grant_type=authorization_code&redirect_uri={4}'.format(settings.TOKEN_URL, settings.CLIENT_ID, settings.CLIENT_PWD, code, settings.REDIRECT_URI)
     r=requests.get(url)
     # parse string into Python dictionary
@@ -50,7 +52,7 @@ def api_token_from_code(request,code):
     logger.info('retrieved a new access token: {0}'.format(access_token))
     
     # determine user
-    player = api_me()
+    player = api_me(access_token)
     request.session['user_id']=player['id']
     # for convenience, we also store a list of the user's team ids in the session
     user_teamids=[]
@@ -126,7 +128,12 @@ def api_update(url, updatedict={}):
     return api_put(url, new_dict)
 
 
-def api_me():
+def api_me(access_token):
+    global session
+    session.headers.update({'Authorization': 'bearer {0}'.format(access_token),
+                  'Content-Type': 'application/json',
+                  'Accept': 'application/json'})
+
     url='{0}/v1/players/me/'.format(settings.HOST)
     response = session.get(url)
     return response.json()
