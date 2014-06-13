@@ -37,8 +37,8 @@ if ON_HEROKU:
         CLIENT_PWD = os.environ['CLIENT_PWD']
         TOKEN_URL = 'https://www.leaguevine.com'
     REDIRECT_URI = os.environ['REDIRECT_URI']
-    CLIENT_ID = '691cad4da330e02a36539d2f412eb0'
-    CLIENT_PWD = '2ef5a2643216c35efac0500f7752e6'
+    # CLIENT_ID = '691cad4da330e02a36539d2f412eb0'
+    # CLIENT_PWD = '2ef5a2643216c35efac0500f7752e6'
 else:
     # these credentials refer to an app which redirects to  http://127.0.0.1:8000/code/
     # https://www.leaguevine.com/apps/84/
