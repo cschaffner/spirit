@@ -502,7 +502,7 @@ def TeamsFromGames(spirit, games):
             teams[id]['avg_given'] = map(lambda x: sum(x) / teams[id]['nr_given'], zip(*team['given'].values()))
             teams[id]['avg_given_total'] = sum(teams[id]['avg_given'])
             teams[id]['avg_given'] = map(lambda x: round(x,2), teams[id]['avg_given'])
-    logger.info(pformat(teams))
+    logger.debug(pformat(teams))
     return teams, games
 
 

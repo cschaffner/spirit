@@ -4,33 +4,38 @@
 
 from django.conf import settings
 from django.core.cache import cache
+
+from settings import CACHE_TIME
+
 import requests
 import logging
-import sys
+from sys import getsizeof
 import csv
 import itertools
 import json
 from pprint import pformat
 
+
+logging.basicConfig(level=logging.DEBUG)
 # Get an instance of a logger
 logger = logging.getLogger('spirit')
 
 access_token = cache.get('access_token')
-if access_token is None:
-    # Make a request for an access_token
-    if settings.OFFLINE:
-        access_token='offline'
-    else:
-        url=u'{0}/oauth2/token/?client_id={1}&client_secret={2}&grant_type=client_credentials&scope=universal'.format(settings.TOKEN_URL, settings.CLIENT_ID, settings.CLIENT_PWD)
-        r=requests.get(url)
-        # parse string into Python dictionary
-        r_dict = r.json()
-        access_token = r_dict.get('access_token')
-        cache.set('access_token', access_token)
-        cache.set('user_id', u'anonymous')
-        logger.info('in wrapper: retrieved a new access token: {0}'.format(access_token))
-else:
-    logger.info('in wrapper: retrieved token from cache')
+# if access_token is None:
+#     # Make a request for an access_token
+#     if settings.OFFLINE:
+#         access_token='offline'
+#     else:
+#         url=u'{0}/oauth2/token/?client_id={1}&client_secret={2}&grant_type=client_credentials&scope=universal'.format(settings.TOKEN_URL, settings.CLIENT_ID, settings.CLIENT_PWD)
+#         r=requests.get(url)
+#         # parse string into Python dictionary
+#         r_dict = r.json()
+#         access_token = r_dict.get('access_token')
+#         cache.set('access_token', access_token)
+#         cache.set('user_id', u'anonymous')
+#         logger.info('in wrapper: retrieved a new access token: {0}'.format(access_token))
+# else:
+#     logger.info('in wrapper: retrieved token from cache')
 
 session = requests.Session()
 session.headers.update({'Authorization': 'bearer {0}'.format(access_token),
@@ -39,8 +44,6 @@ session.headers.update({'Authorization': 'bearer {0}'.format(access_token),
 
 def api_token_from_code(request, code):
     global my_headers
-
-
 
     url=u'{0}/oauth2/token/?client_id={1}&client_secret={2}&code={3}&grant_type=authorization_code&redirect_uri={4}'.format(settings.TOKEN_URL, settings.CLIENT_ID, settings.CLIENT_PWD, code, settings.REDIRECT_URI)
     r=requests.get(url)
@@ -66,16 +69,28 @@ def api_token_from_code(request, code):
 
     return access_token
 
+
 def api_get(url):
+    if cache.get(url):
+        logger.debug('returning cached data ({0} bytes) from URL: {1}'.format(getsizeof(cache.get(url)), url))
+        return cache.get(url)
+
     response = session.get(url)
+    logger.debug(response.elapsed)
     response_dict = response.json()
     objects=response_dict['objects']
     while response_dict['meta']['next'] != None:
-        url=response_dict['meta']['next']
-        response = session.get(url)
-        response_dict = response.json()
+        next_url=response_dict['meta']['next']
+        if cache.get(next_url):
+            response_dict = cache.get(next_url)
+        else:
+            response = session.get(next_url)
+            logger.debug(response.elapsed)
+            response_dict = response.json()
+            cache.set(url, response_dict, CACHE_TIME)
         objects=objects + response_dict['objects']
     response_dict['objects']=objects
+    cache.set(url, response_dict, CACHE_TIME)
     return response_dict
 
 

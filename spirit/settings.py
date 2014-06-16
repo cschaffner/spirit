@@ -1,5 +1,6 @@
 # Django settings for spirit project.
 import os
+from memcacheify import memcacheify
 
 ROOT_PATH = os.path.dirname(__file__)
 
@@ -10,6 +11,8 @@ OFFLINE = False
 # except ImportError, e:
 #     pass
 
+CACHES = memcacheify()
+CACHE_TIME = 60 * 60 * 24  # 1 day
 
 # allows to switch between the real and the testing leaguevine server
 #HOST="http://api.playwithlv.com"
@@ -211,7 +214,7 @@ LOGGING = {
             'class': 'django.utils.log.NullHandler',
         },
         'console': {
-            'level': 'INFO',
+            'level': 'DEBUG',
             'class': 'logging.StreamHandler',
             'formatter': 'verbose'
         },
@@ -228,7 +231,7 @@ LOGGING = {
         },
         'spirit': {
             'handlers': ['console'],
-            'level': 'DEBUG',
+            'level': 'INFO',
         },
 
     }
