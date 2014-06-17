@@ -7,13 +7,24 @@
 
 <h2>Teams</h2>
 <table id="table-teams" class="table tablesorter">
+	<thead>
+	<tr>
+		<th>Rank</th>
+		<th>Team</th>
+		<th>Avg Rec Total</th>
+		<th>Nr Given</th>
+	</tr>
+	</thead>
+	<tbody>
 	{% for id, t in teams %}
 	<tr>
-    <td>{{ forloop.counter }}</td>
-    <td>{{ t.name }}</td>
-		<td>{{ t.avg_received_total|floatformat:-2 }}</td>
+        <td>{{ forloop.counter }}</td>
+        <td>{{ t.name }}</td>
+        <td>{{ t.avg_received_total|floatformat:-2 }}</td>
+        <td>{{ t.nr_given }}</td>
 	</tr>
 	{% endfor %}
+    </tbody>
 </table>
 
 
