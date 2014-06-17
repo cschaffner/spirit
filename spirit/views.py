@@ -289,6 +289,33 @@ def tournament(request, tournament_id):
                                                   'teams': teams,
                                                   'info': info})
 
+def result(request, tournament_id):
+    info = api_tournamentbyid(tournament_id)
+    # retrieve all games of this tournament
+    spirit = api_spiritbytournament(tournament_id)
+    games = api_gamesbytournament(tournament_id)
+    # remove BYE games, as those are irrelevant for spirit scores:
+    games['objects'] = [g for g in games['objects'] if g['team_2_id']]
+
+
+    if (u'errors' in spirit):
+        errmsg = '{0}'.format(spirit['errors'])
+        return render_to_response('error.html', {'error': errmsg})
+
+    user_id = request.session.get('user_id', None)
+    user_first_name = request.session.get('first_name', None)
+    user_teamids = request.session.get('user_teamids', [])
+    for g in games['objects']:
+        g['datetime'] = parse_datetime(g['start_time'])
+        g['team_1_spirit_editable'] = g['team_2_id'] in user_teamids
+        g['team_2_spirit_editable'] = g['team_1_id'] in user_teamids
+
+    # compute spirit score overview
+    teams, games_wspirit = TeamsFromGames(spirit['objects'], games['objects'])
+
+    end_result = sorted(teams.iteritems(), key=lambda x: x[1].get('avg_received_total'), reverse=True)
+    return render_to_response('result.html', {'teams': end_result})
+
 
 def game(request, game_id):
     # retrieve this game

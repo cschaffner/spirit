@@ -16,6 +16,7 @@ urlpatterns = patterns('',
     url(r'^team/(\d+)/$', 'spirit.views.team'),
     url(r'^team/(\d+)/(\d+)-(\d+)-(\d+)/$', 'spirit.views.team_date'),
     url(r'^tournament/(\d+)/$', 'spirit.views.tournament'),
+    url(r'^result/(\d+)/$', 'spirit.views.result'),
     url(r'^game/(\d+)/$', 'spirit.views.game'),
     url(r'^game/(\d+)/submit/([1|2])/$', 'spirit.views.game_submit'),
     
