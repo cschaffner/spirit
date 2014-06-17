@@ -3,7 +3,7 @@
 {% block content %}
 
 <h1>Team page of {{team.name}}</h1>
-<h6>Season: {{team.season.name}}, {{team.season.league.name}}</h6>
+<h6>Season: <a href="/season/{{team.season.id}}">{{team.season.name}}</a>, {{team.season.league.name}}</h6>
 
 <hr />
 
@@ -18,23 +18,29 @@
       <th>Result</th>
       <th>Given</th>
       <th>Received</th>
-      <th>&nbsp;</th>
-      <th>&nbsp;</th>
+      {% if user_first_name %}<th>&nbsp;</th>{% endif %}
+      <th>Tournament</th>
     </tr>
   </thead>
   <tbody>
 {% for g in games %}
   <tr>
     <td>{{g.game_site.name}}</td>
-    <td><a href="/team/{{ team.id }}/{{ g.datetime|date:"Y-m-d" }}/">{{g.datetime|date:"D d H:i"}}<a></a></td>
+    {% if user_first_name %}
+        <td><a href="/team/{{ team.id }}/{{ g.datetime|date:"Y-m-d" }}/">{{g.datetime|date:"D d H:i"}}</a></td>
+    {% else %}
+        <td>{{g.datetime|date:"D d H:i"}}</td>
+    {% endif %}
     <td><a href="/team/{{g.opp_id}}/">{{g.opp.name}}</a></td>
     <td><a href="/game/{{g.id}}/">{{g.score_string}}</a></td>
     <td{% if not g.spirit_given %} class="danger"{% endif %}>{% if g.spirit_given %}{{g.spirit_given}}{% else %}&nbsp;{% endif %}</td>
     <td{% if not g.spirit_received %} class="danger"{% endif %}>{% if g.spirit_received %}{{g.spirit_received}}{% else %}&nbsp;{% endif %}</td>
-    <td>
-      <a href="/game/{{g.id}}/submit/{{g.my_team}}/" class="btn btn-success ww-tooltip" title="give to {{g.opp.name}}">give</a>
-      <a href="/game/{{g.id}}/submit/{{g.opp_team}}/" class="btn btn-info ww-tooltip" title="receive from {{g.opp.name}}">receive</a>
-    </td>
+    {% if user_first_name %}
+        <td>
+          <a href="/game/{{g.id}}/submit/{{g.my_team}}/" class="btn btn-success ww-tooltip" title="give to {{g.opp.name}}">give</a>
+          <a href="/game/{{g.id}}/submit/{{g.opp_team}}/" class="btn btn-info ww-tooltip" title="receive from {{g.opp.name}}">receive</a>
+        </td>
+    {% endif %}
     <td><a href="/tournament/{{g.tournament.id}}/" title="{{g.tournament.name}}"><i class="fa fa-dot-circle-o"></i></a></td>
   </tr>
 {% endfor %}

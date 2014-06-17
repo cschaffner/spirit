@@ -12,7 +12,7 @@ OFFLINE = False
 #     pass
 
 CACHES = memcacheify()
-CACHE_TIME = 60 * 60 * 24  # 1 day
+CACHE_TIME = 60 * 60 * 24  * 14 # 14 days
 
 # allows to switch between the real and the testing leaguevine server
 #HOST="http://api.playwithlv.com"
@@ -62,7 +62,6 @@ LOGINURL = '{0}/oauth2/authorize/?client_id={1}&response_type=code&redirect_uri=
                                                                                                             CLIENT_ID,
                                                                                                             REDIRECT_URI)
 
-DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (

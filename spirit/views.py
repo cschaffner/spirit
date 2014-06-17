@@ -19,7 +19,7 @@ def home(request):
     first_name = request.session.get('first_name', None)
 
     if user_id == None or first_name == None:
-        return render_to_response('spirit.html', {'loginurl': settings.LOGINURL})
+        return render_to_response('spirit_wwx.html', {'loginurl': settings.LOGINURL})
     else:
         team_players = api_team_playersbyplayer(user_id)
         logger.info(pformat(team_players))
@@ -28,7 +28,9 @@ def home(request):
 
 
 def login(request):
-    return redirect(settings.LOGINURL)
+#  disable
+    return render_to_response('spirit_wwx.html', {'loginurl': settings.LOGINURL})
+    # return redirect(settings.LOGINURL)
 
 
 def logout(request):
