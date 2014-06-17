@@ -487,7 +487,7 @@ def TeamsFromGames(spirit, games):
                 # decode string into list
                 team_1_score = json.loads(score['team_1_score'])
                 # double check
-                if len(team_1_score) <= 1 or not _score_is_valid(team_1_score):
+                if not _score_is_valid(team_1_score) or len(team_1_score) <= 1:
                     logger.error('decoding of {0} did probably not work!'.format(team_1_score))
                 else:
                     if not score['game_id'] in teams[score['team_1_id']]['received']:
@@ -498,7 +498,7 @@ def TeamsFromGames(spirit, games):
                 # decode string into list
                 team_2_score = json.loads(score['team_2_score'])
                 # double check                        
-                if len(team_2_score) <= 1 or not _score_is_valid(team_2_score):
+                if not _score_is_valid(team_2_score) or len(team_2_score) <= 1:
                     logger.error('decoding of {0} did probably not work!'.format(team_2_score))
                 else:
                     if not score['game_id'] in teams[score['team_2_id']]['received']:

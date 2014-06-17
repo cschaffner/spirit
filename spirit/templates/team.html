@@ -33,8 +33,8 @@
     {% endif %}
     <td><a href="/team/{{g.opp_id}}/">{{g.opp.name}}</a></td>
     <td><a href="/game/{{g.id}}/">{{g.score_string}}</a></td>
-    <td{% if not g.spirit_given %} class="danger"{% endif %}>{% if g.spirit_given %}{{g.spirit_given}}{% else %}&nbsp;{% endif %}</td>
-    <td{% if not g.spirit_received %} class="danger"{% endif %}>{% if g.spirit_received %}{{g.spirit_received}}{% else %}&nbsp;{% endif %}</td>
+    <td{% if not g.spirit_given %} class="danger"{% endif %}>{% if g.spirit_given %}<span title="[rules, fouls, fairness, attitude, communication]">{{g.spirit_given}}</span>{% else %}&nbsp;{% endif %}</td>
+    <td{% if not g.spirit_received %} class="danger"{% endif %}>{% if g.spirit_received %}<span title="[rules, fouls, fairness, attitude, communication]">{{g.spirit_received}}</span>{% else %}&nbsp;{% endif %}</td>
     {% if user_first_name %}
         <td>
           <a href="/game/{{g.id}}/submit/{{g.my_team}}/" class="btn btn-success ww-tooltip" title="give to {{g.opp.name}}">give</a>

@@ -11,6 +11,7 @@
 </div> -->
 
 <h2>Teams</h2>
+<div>(Click on table headers to sort)</div>
 <table id="table-teams" class="table tablesorter">
 	<thead>
 	<tr>
@@ -26,11 +27,11 @@
 	<tbody>
 	{% for id,t in teams.iteritems %}
 	<tr><td><a href="/team/{{ t.id }}/">{{t.name}}</a></td>
-		<td>{{t.avg_received}}</td>
-		<td>{{t.avg_received_total|floatformat:2}}</td>
+		<td><span title="[rules, fouls, fairness, attitude, communication]">{{t.avg_received}}</span></td>
+		<td><span title="[rules, fouls, fairness, attitude, communication]">{{t.avg_received_total|floatformat:2}}</span></td>
 		<td>{{t.nr_received}}</td>
-		<td>{{t.avg_given}}</td>
-		<td>{{t.avg_given_total|floatformat:2}}</td>
+		<td><span title="[rules, fouls, fairness, attitude, communication]">{{t.avg_given}}</span></td>
+		<td><span title="[rules, fouls, fairness, attitude, communication]">{{t.avg_given_total|floatformat:2}}</span></td>
 		<td>{{t.nr_given}}</td>
 	</tr>
 	{% endfor %}
@@ -57,8 +58,14 @@
     <td><a href="/team/{{g.team_1_id}}/">{{g.team_1.name}}</a></td>
 		<td><a href="/game/{{g.id}}/">{{g.team_1_score}} - {{g.team_2_score}}</a></td>
 		<td><a href="/team/{{g.team_2_id}}/">{{g.team_2.name}}</a></td>
-    <td><a href="/game/{{g.id}}/submit/2/" class="btn btn-default">{% if g.team_1_spirit %}{{g.team_1_spirit}}{% else %}enter{% endif %}</a></td>
-		<td><a href="/game/{{g.id}}/submit/1/" class="btn btn-default">{% if g.team_2_spirit %}{{g.team_2_spirit}}{% else %}enter{% endif %}</a></td>
+    <td><a href="/game/{{g.id}}/submit/2/" class="btn btn-default">
+        {% if g.team_1_spirit %}<span title="[rules, fouls, fairness, attitude, communication]">{{g.team_1_spirit}}</span>{% else %}enter{% endif %}
+        </a>
+    </td>
+		<td><a href="/game/{{g.id}}/submit/1/" class="btn btn-default">
+            {% if g.team_2_spirit %}<span title="[rules, fouls, fairness, attitude, communication]">{{g.team_2_spirit}}</span>{% else %}enter{% endif %}
+            </a>
+        </td>
 	</tr>
 	{% endfor %}
 </table>
