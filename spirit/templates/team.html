@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load tz %}
 
 {% block content %}
 
@@ -26,11 +27,13 @@
 {% for g in games %}
   <tr>
     <td>{{g.game_site.name}}</td>
+    {% localtime off %}
     {% if user_first_name %}
-        <td><a href="/team/{{ team.id }}/{{ g.datetime|date:"Y-m-d" }}/">{{g.datetime|date:"D d H:i"}}</a></td>
+        <td><a href="/team/{{ team.id }}/{{ g.datetime|date:"Y-m-d" }}/">{{g.datetime|date:"D d H:i e"}} </a></td>
     {% else %}
         <td>{{g.datetime|date:"D d H:i"}}</td>
     {% endif %}
+    {% endlocaltime %}
     <td><a href="/team/{{g.opp_id}}/">{{g.opp.name}}</a></td>
     <td><a href="/game/{{g.id}}/">{{g.score_string}}</a></td>
     <td{% if not g.spirit_given %} class="danger"{% endif %}>{% if g.spirit_given %}<span title="[rules, fouls, fairness, attitude, communication]">{{g.spirit_given}}</span>{% else %}&nbsp;{% endif %}</td>

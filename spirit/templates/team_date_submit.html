@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load bootstrap static %}
+{% load bootstrap static tz %}
 
 {% block headercss %}
   <link rel="stylesheet" href="{% static "css/spirit.css" %}" />
@@ -17,7 +17,9 @@
             {{ formset.management_form }}
                 {% for form in formset %}
                     <div class="col-md-3">
+                    {% localtime off %}
                     {{ form|bootstrap }}
+                    {% endlocaltime %}
                     </div>
                 {% endfor %}
             </div>

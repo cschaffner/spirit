@@ -1,12 +1,17 @@
 {% extends "overview.html" %}
+{% load tz %}
 
 {% block title %}
-<h1>Spirit scores of Tournament {{id}}</h1>
+<h1>Spirit scores of Tournament {{info.name}}</h1>
 
-<p>Spirit scores are computed based on {{games|length}} games in this tournament.</p>
+<p>Spirit scores are computed based on {{games|length}} game{{ games|pluralize }} in this tournament.</p>
 
 <div>League: {{info.season.league.name}}</div>
 <div>Season: <a href="/season/{{info.season_id}}">{{info.season.name}}</a></div>
-<div>Tournament: {{info.name}}</div>
+<div>Tournament: {{ info.name }}</div>
+{% localtime off %}
+<div>Start Date: {{ info.start_datetime|date:"D d M Y" }}</div>
+<div>End Date: {{ info.end_datetime|date:"D d M Y" }}</div>
+{% endlocaltime %}
 
 {% endblock title %}

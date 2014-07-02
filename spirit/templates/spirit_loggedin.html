@@ -1,23 +1,10 @@
-{% extends "base.html" %}
+{% extends "spirit.html" %}
 
-{% block content %}
-<h1>Spirit scores</h1>
-
-<h2>Windmill Windup Tournaments</h2>
-<ul>
-	<li><a href="/game/147614/">/game/147614/</a></li>
-	<li><a href="/tournament/19521/">/Windmill X Open</a></li>
-	<li><a href="/tournament/19522/">/Windmill X Mixed</a></li>
-	<li><a href="/tournament/19523/">/Windmill X Women</a></li>
-	<li><a href="/team/25447/">/Cambo Cakes</a></li>
-</ul>
-
-
-You are member of the following teams:<br>
+{% block loggedin %}
+<h3>Your Teams</h3>
 <ul>
 {% for t in team_players %}
 <li><a href="team/{{t.team_id}}/">{{t.team.name}}</a> ({{t.team.season.name}}, {{t.team.season.league.name}})</li>
 {% endfor %}
 </ul>
-
-{% endblock content %}
+{% endblock %}

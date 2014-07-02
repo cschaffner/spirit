@@ -1,7 +1,7 @@
 from __future__ import division
 from django.shortcuts import render_to_response, get_object_or_404, redirect, render
 from django.http import HttpResponseRedirect
-from django.utils.dateparse import parse_datetime
+from django.utils.dateparse import parse_datetime, parse_date
 from django.forms.formsets import formset_factory
 
 from operator import itemgetter
@@ -16,26 +16,34 @@ logger = logging.getLogger('spirit')
 
 def home(request):
     user_id = request.session.get('user_id', None)
-    first_name = request.session.get('first_name', None)
+    user_first_name = request.session.get('user_first_name', None)
+    recent_tournaments = api_recent_tournaments(20)
+    recent_games = api_recent_games(10)
 
-    if user_id == None or first_name == None:
-        return render_to_response('spirit_wwx.html', {'loginurl': settings.LOGINURL})
+    context = {}
+    if recent_tournaments['meta']['total_count'] > 0:
+        context['recent_tournaments'] = recent_tournaments['objects']
+    if recent_games['meta']['total_count'] > 0:
+        context['recent_games'] = recent_games['objects']
+
+    if user_id == None or user_first_name == None:
+        context['loginurl'] = settings.LOGINURL
+        return render_to_response('spirit.html', context)
     else:
-        team_players = api_team_playersbyplayer(user_id)
-        logger.info(pformat(team_players))
-        return render_to_response('spirit_loggedin.html', {'first_name': first_name,
-                                                           'team_players': team_players['objects']})
+        context['user_first_name'] = user_first_name
+        context['team_players'] = api_team_playersbyplayer(user_id)['objects']
+        return render_to_response('spirit_loggedin.html', context)
 
 
 def login(request):
-#  disable
-    return render_to_response('spirit_wwx.html', {'loginurl': settings.LOGINURL})
-    # return redirect(settings.LOGINURL)
+# #  disable
+#     return render_to_response('spirit_wwx.html', {'loginurl': settings.LOGINURL})
+    return redirect(settings.LOGINURL)
 
 
 def logout(request):
     # flushes the session down the toilet
-    # in particular, erases 'user_id', 'first_name', and 'access_token" and makes it inaccessible for following session
+    # in particular, erases 'user_id', 'user_first_name', and 'access_token" and makes it inaccessible for following session
     request.session.flush()
 
     return redirect('/')
@@ -56,7 +64,7 @@ def team(request, team_id):
     games['objects'] = [g for g in games['objects'] if g['team_2_id']]
 
     user_id = request.session.get('user_id', None)
-    user_first_name = request.session.get('first_name', None)
+    user_first_name = request.session.get('user_first_name', None)
     user_teamids = request.session.get('user_teamids', [])
 
     game_ids = []
@@ -114,7 +122,7 @@ def team(request, team_id):
 
     return render_to_response('team.html', {'team': t,
                                             'games': games['objects'],
-                                            'first_name': user_first_name})
+                                            'user_first_name': user_first_name})
 
 def team_date(request, team_id, year, month, day):
     team = api_teambyid(team_id)
@@ -139,11 +147,10 @@ def team_date(request, team_id, year, month, day):
     games = sorted(games, key=itemgetter('datetime'))
 
     user_id = request.session.get('user_id', None)
-    user_first_name = request.session.get('first_name', None)
-    user_teamids = request.session.get('user_teamids', [])
+    user_first_name = request.session.get('user_first_name', None)
 
     if not user_id:
-        return render_to_response('error.html', {'error': 'You have to log in to edit spirit scores.'})
+        return render_to_response('error.html', {'error': 'You have to <a href="/login/">log in</a> to edit spirit scores.'})
 
 
     SpiritFormSet = formset_factory(SpiritForm, extra=len(games))
@@ -172,7 +179,8 @@ def team_date(request, team_id, year, month, day):
         formset = SpiritFormSet()  # Unbound forms
         for form, game in zip(formset, games):
             form.fields['game_start'].initial = game['datetime']
-            form.fields['occasion'].initial = game['tournament']['name']
+            if game['tournament']:
+                form.fields['occasion'].initial = game['tournament']['name']
             if game['swiss_round_id']:
                 form.fields['occasion'].initial += ', Swissround {0}'.format(game['swiss_round']['round_number'])
 
@@ -211,6 +219,7 @@ def team_date(request, team_id, year, month, day):
 
     return render(request, 'team_date_submit.html', {
         'formset': formset,
+        'user_first_name': user_first_name,
         'team': team,
         'year': year,
         'month': month,
@@ -246,7 +255,7 @@ def season(request, season_id):
         return render_to_response('error.html', {'error': errmsg})
 
     user_id = request.session.get('user_id', None)
-    user_first_name = request.session.get('first_name', None)
+    user_first_name = request.session.get('user_first_name', None)
     user_teamids = request.session.get('user_teamids', [])
     for g in games['objects']:
         g['datetime'] = parse_datetime(g['start_time'])
@@ -255,7 +264,7 @@ def season(request, season_id):
 
     # compute spirit score overview
     teams, games_wspirit = TeamsFromGames(spirit['objects'], games['objects'])
-    return render_to_response('season.html', {'first_name': user_first_name,
+    return render_to_response('season.html', {'user_first_name': user_first_name,
                                               'id': season_id,
                                               'games': games_wspirit,
                                               'teams': teams,
@@ -264,6 +273,8 @@ def season(request, season_id):
 
 def tournament(request, tournament_id):
     info = api_tournamentbyid(tournament_id)
+    info[u'start_datetime'] = parse_date(info['start_date'])
+    info[u'end_datetime'] = parse_date(info['end_date'])
     # retrieve all games of this tournament
     spirit = api_spiritbytournament(tournament_id)
     games = api_gamesbytournament(tournament_id)
@@ -276,7 +287,7 @@ def tournament(request, tournament_id):
         return render_to_response('error.html', {'error': errmsg})
 
     user_id = request.session.get('user_id', None)
-    user_first_name = request.session.get('first_name', None)
+    user_first_name = request.session.get('user_first_name', None)
     user_teamids = request.session.get('user_teamids', [])
     for g in games['objects']:
         g['datetime'] = parse_datetime(g['start_time'])
@@ -285,7 +296,7 @@ def tournament(request, tournament_id):
 
     # compute spirit score overview
     teams, games_wspirit = TeamsFromGames(spirit['objects'], games['objects'])
-    return render_to_response('tournament.html', {'first_name': user_first_name,
+    return render_to_response('tournament.html', {'user_first_name': user_first_name,
                                                   'id': tournament_id,
                                                   'games': games_wspirit,
                                                   'teams': teams,
@@ -305,7 +316,7 @@ def result(request, tournament_id):
         return render_to_response('error.html', {'error': errmsg})
 
     user_id = request.session.get('user_id', None)
-    user_first_name = request.session.get('first_name', None)
+    user_first_name = request.session.get('user_first_name', None)
     user_teamids = request.session.get('user_teamids', [])
     for g in games['objects']:
         g['datetime'] = parse_datetime(g['start_time'])
@@ -328,7 +339,7 @@ def game(request, game_id):
         return render_to_response('error.html', {'error': errmsg})
 
     user_id = request.session.get('user_id', None)
-    user_first_name = request.session.get('first_name', None)
+    user_first_name = request.session.get('user_first_name', None)
     user_teamids = request.session.get('user_teamids', [])
     game['team_2_spirit_editable'] = game['team_1_id'] in user_teamids
     game['team_1_spirit_editable'] = game['team_2_id'] in user_teamids
@@ -356,7 +367,7 @@ def game(request, game_id):
             game['team_2_comment'] = s['team_2_comment']
 
     return render_to_response('game.html', {'loginurl': settings.LOGINURL,
-                                            'first_name': user_first_name,
+                                            'user_first_name': user_first_name,
                                             'game': game, 'spirit': spirit})
 
 
@@ -369,9 +380,9 @@ def game_submit(request, game_id, team_idx_giving):
         return render_to_response('error.html', {'error': errmsg})
 
     user_id=request.session.get('user_id',None)
-    first_name=request.session.get('first_name',None)
+    user_first_name=request.session.get('user_first_name', None)
     if not user_id:
-        return render_to_response('error.html', {'error': 'You have to log in to edit spirit scores.'})
+        return render_to_response('error.html', {'error': 'You have to <a href="/login/">log in</a> to edit spirit scores.'})
 
     # user_team_ids=request.session.get('user_teamids',None)
     # if (team_idx_giving == u'1' and not game['team_1_id'] in user_team_ids):
@@ -403,7 +414,8 @@ def game_submit(request, game_id, team_idx_giving):
         form = SpiritForm()  # An unbound form
         game['datetime'] = parse_datetime(game['start_time'])
         form.fields['game_start'].initial = game['datetime']
-        form.fields['occasion'].initial = game['tournament']['name']
+        if game['tournament']:
+            form.fields['occasion'].initial = game['tournament']['name']
         if game['swiss_round_id']:
             form.fields['occasion'].initial += ', Swissround {0}'.format(game['swiss_round']['round_number'])
         if team_idx_giving == u'1':
@@ -448,6 +460,7 @@ def game_submit(request, game_id, team_idx_giving):
     return render(request, 'game_submit.html', {
         'form': form,
         'game': game,
+        'user_first_name': user_first_name,
         'team_giving': team_giving,
         'team_idx_giving': team_idx_giving,
         'team_receiving': team_receiving

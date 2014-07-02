@@ -1,23 +1,30 @@
 {% extends "base.html" %}
-{% load bootstrap %}
 
+{% load bootstrap static tz%}
+
+{% block headercss %}
+  <link rel="stylesheet" href="{% static "css/spirit.css" %}" />
+{% endblock %}
 
 {% block content %}
-  <style type="text/css">
-    .form-group {
-      width: 50%;
-      float: left;
-      overflow: hidden;
-    }
-  </style>
+{#  <style type="text/css">#}
+{#    .form-group {#}
+{#      width: 50%;#}
+{#      float: left;#}
+{#      overflow: hidden;#}
+{#    }#}
+{#  </style>#}
   <div class="row">
     <div class="col-md-8">
       <h2><a href="/team/{{ team_giving.id }}/" class="label label-primary">{{team_giving.name}}</a> gives
           <a href="/team/{{ team_receiving.id }}/" class="label label-info">{{team_receiving.name}}</a></h2>
       <br />
       <form action="/game/{{game.id}}/submit/{{team_idx_giving}}/" method="post">{% csrf_token %}
-        {{ form|bootstrap }}
-        <input type="submit" value="Submit" class="btn btn-primary btn-lg" />
+            {% csrf_token %}
+            <div class="row">
+                {{ form|bootstrap }}
+            </div>
+            <input type="submit" value="Submit" class="btn btn-primary btn-lg" />
       </form>
 
     </div>
@@ -30,7 +37,9 @@
 
       Teams: {{game.team_1.name}} - {{game.team_2.name}}<br>
       Score: {{game.team_1_score}} - {{game.team_2_score}}<br>
+      {% localtime off %}
       Time: {{game.start_time}}<br>
+      {% endlocaltime %}
       Tournament: {{game.tournament.name}}<br>
       Season: {{game.season.name}}<br>
       League: {{game.season.league.name}}<br>
@@ -40,10 +49,54 @@
   </div>
 
 
-
-
-
-
-
-  <br /><br />
 {% endblock content %}
+
+{% block post %}
+  {{ block.super }}
+  <script type="text/javascript">
+    $(function() {
+      $("div.radio").each(function() {
+        buildRadio($(this));
+      });
+
+      updateScores();
+    });
+
+
+  function buildRadio(o) {
+    o.find('label').hide();
+    o.removeClass('radio').addClass('radio-new');
+    var input = o.find('input');
+    var a = $("<a class='ar' href='#'>" + input.val() + "</a>");
+
+    if(input.prop('checked')) {
+      a.addClass('active');
+    }
+    a.click(function(e){
+      e.preventDefault();
+      var parent = o.parent();
+      parent.find('input').prop('checked', false);
+      parent.find('a').removeClass('active');
+      input.prop('checked', true);
+      a.addClass('active');
+      updateScores();
+    });
+
+    o.append(a);
+
+  }
+
+
+  function updateScores() {
+    $('input[type=number]').each(function() {
+      var input = $(this);
+      var formset = input.parentsUntil('.row');
+      var val = 0;
+      formset.find('.radio-new input[type=radio]:checked').each(function() {
+        val += parseInt($(this).val());
+      });
+      input.val(val);
+    });
+  }
+  </script>
+{% endblock %}

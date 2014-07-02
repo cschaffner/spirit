@@ -9,9 +9,10 @@ Comments:
 
 
 Goal:
-Have this ready for Windmill Windup 2013, taking place 
-http://www.windmillwindup.com/2013/
+Used at Windmill Windup 2014, http://www.windmillwindup.com
 
+ToDo:
+* timezone support in forms
 
 Instructions for deploying in a development environment:
 * Goto https://www.leaguevine.com/apps/ and click on create a new app

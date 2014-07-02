@@ -57,14 +57,14 @@ def api_token_from_code(request, code):
     # determine user
     player = api_me(access_token)
     request.session['user_id']=player['id']
+    request.session['user_first_name']=player['first_name']
     # for convenience, we also store a list of the user's team ids in the session
     user_teamids=[]
     team_playerids=api_team_playeridsbyplayer(player['id']) 
     for team_ids in team_playerids['objects']:
         user_teamids.append(team_ids['team_id'])
     request.session['user_teamids']=user_teamids
-    request.session['first_name']=player['first_name']
-        
+
     # my_headers={'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': 'bearer {0}'.format(access_token)}
 
     return access_token
@@ -151,6 +151,18 @@ def api_me(access_token):
                   'Accept': 'application/json'})
 
     url='{0}/v1/players/me/'.format(settings.HOST)
+    response = session.get(url)
+    return response.json()
+
+
+def api_recent_tournaments(limit=10):
+    url = '{0}/v1/tournaments/?order_by=%5B-end_date%5D&limit={1}'.format(settings.HOST, limit)
+    response = session.get(url)
+    return response.json()
+
+
+def api_recent_games(limit=10):
+    url = '{0}/v1/games/?order_by=%5B-start_time%5D&limit={1}'.format(settings.HOST, limit)
     response = session.get(url)
     return response.json()
 

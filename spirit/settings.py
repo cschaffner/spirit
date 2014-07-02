@@ -48,7 +48,7 @@ else:
     CLIENT_ID = 'e41df6413799888cbf02987ebede49'
     CLIENT_PWD = '6bbbd86bef4b4359d3298ce9112f56'
     REDIRECT_URI = 'http://127.0.0.1:8000/code/'
-    REDIRECT_URI = 'http://10.10.255.179:8000/code/'
+    # REDIRECT_URI = 'http://10.10.255.179:8000/code/'
 
 
 if HOST == "http://api.playwithlv.com":

@@ -22,13 +22,13 @@ $(document).ready(function()
 <div>Team 2: <a href="/team/{{game.team_2_id}}/">{{game.team_2.name}}</a></div>
 
 <div>Spirit of Team 1: {{game.team_1_spirit}} 
-    {% if first_name %}<a href="/game/{{game.id}}/submit/2/">Edit</a>{% endif %}
+    {% if user_first_name %}<a href="/game/{{game.id}}/submit/2/">Edit</a>{% endif %}
 </div>
 <div>Spirit Comment for Team 1: {{game.team_1_comment}}</div>
 
 
 <div>Spirit of Team 2: {{game.team_2_spirit}}
-	{% if first_name %}<a href="/game/{{game.id}}/submit/1/">Edit</a>{% endif %}</div>
+	{% if user_first_name %}<a href="/game/{{game.id}}/submit/1/">Edit</a>{% endif %}</div>
 <div>Spirit Comments for Team 2: {{game.team_2_comment}}</div>
 
 
