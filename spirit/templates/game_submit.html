@@ -90,7 +90,7 @@
   function updateScores() {
     $('input[type=number]').each(function() {
       var input = $(this);
-      var formset = input.parentsUntil('.row');
+      var formset = input.parentsUntil('.form');
       var val = 0;
       formset.find('.radio-new input[type=radio]:checked').each(function() {
         val += parseInt($(this).val());
