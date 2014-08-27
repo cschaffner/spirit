@@ -651,7 +651,11 @@ def api_addpool(tournament_id,starttime,name,team_ids=[],time_between_rounds=120
 def api_addspirit(game_id,data_dict):
     url='{0}/v1/game_sportsmanship_scores/'.format(settings.HOST)
     data_dict['game_id']=game_id
-    return api_post(url,data_dict)
+    response = api_post(url,data_dict)
+    # after adding a new spirit score, all bets about caching are off, we have to clear the cache
+    # TODO: be more clever here and only clear affected caches...
+    cache.clear()
+    return response
 
 
 def result_in_swissround(round,team_id):
