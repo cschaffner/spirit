@@ -1,13 +1,12 @@
 {% extends "base.html" %}
+{% load staticfiles %}
 
 {% block user %}{% endblock user %}
 {% block content %}
 <h1>Error</h1>
-<div id="error">
+<div class="alert alert-danger">
 	An error occurred while retrieving data from leaguevine. Here's what happened:
-</div>
-<div id="msg">
-	{{error}}
+	<p>{{error|safe}}</p>
 </div>
 
 {% endblock content %}

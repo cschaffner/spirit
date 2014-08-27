@@ -42,9 +42,23 @@
     <!-- Collect the nav links, forms, and other content for toggling -->
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav">
+        <li><a href="#" class="dropdown-toggle" data-toggle="dropdown">
+            Dutch Mixed Competition 2014<b class="caret"></b></a>
+        <ul class="dropdown-menu">
+            <li><a href="/tournament/19660/">Speeldag 1</a></li>
+            <li><a href="/tournament/19661/">Speeldag 2</a></li>
+            <li><a href="/tournament/19662/">Speeldag 3</a></li>
+            <li><a href="/season/20494">Whole Season</a></li>
+        </ul>
+        </li>
         <li>
           {% block user %}
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ user_first_name }} <b class="caret"></b></a>
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                {% if user_first_name %}
+                    {{ user_first_name }}
+                {% else %}
+                    not logged in
+                {% endif %} <b class="caret"></b></a>
             <ul class="dropdown-menu">
               <li>{% if user_first_name %}
                 <a href="/logout/">logout</a>
@@ -61,10 +75,6 @@
 </nav>
 
     <div class="container">
-
-
-
-
 
       {% block content %}{% endblock %}
 

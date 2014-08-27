@@ -3,21 +3,6 @@
 {% block content %}
 <h1>Spirit scores</h1>
 
-<h3>Recent Tournaments</h3>
-<ul>
-    {% for tournament in recent_tournaments %}
-    	<li><a href="/season/{{ tournament.season.id }}/">{{ tournament.season.league.name }} {{ tournament.season.name }}</a>:
-            <a href="/tournament/{{ tournament.id }}/">{{ tournament.name }}</a></li>
-    {% endfor %}
-</ul>
-
-<h3>Recent games</h3>
-    <ul>
-    {% for game in recent_games %}
-    	<li><a href="/game/{{ game.id }}/">{{ game.team_1.name }} - {{ game.team_2.name }}</a></li>
-    {% endfor %}
-    </ul>
-
 {% block loggedin %}
 <h3>Instructions</h3>
 
@@ -37,6 +22,23 @@ as follows:
 However, to be able to edit spirit scores, you need to <a href="{{loginurl}}">log in</a> to Leaguevine.
 
 {% endblock loggedin %}
+
+
+<h3>Recent Tournaments</h3>
+<ul>
+    {% for tournament in recent_tournaments %}
+    	<li><a href="/season/{{ tournament.season.id }}/">{{ tournament.season.league.name }} {{ tournament.season.name }}</a>:
+            <a href="/tournament/{{ tournament.id }}/">{{ tournament.name }}</a></li>
+    {% endfor %}
+</ul>
+
+<h3>Recent games</h3>
+    <ul>
+    {% for game in recent_games %}
+    	<li><a href="/game/{{ game.id }}/">{{ game.team_1.name }} - {{ game.team_2.name }}</a></li>
+    {% endfor %}
+    </ul>
+
 
 
 {% endblock content %}

@@ -150,7 +150,7 @@ def team_date(request, team_id, year, month, day):
     user_first_name = request.session.get('user_first_name', None)
 
     if not user_id:
-        return render_to_response('error.html', {'error': 'You have to <a href="/login/">log in</a> to edit spirit scores.'})
+        return render_to_response('error_login.html')
 
 
     SpiritFormSet = formset_factory(SpiritForm, extra=len(games))
@@ -382,7 +382,7 @@ def game_submit(request, game_id, team_idx_giving):
     user_id=request.session.get('user_id',None)
     user_first_name=request.session.get('user_first_name', None)
     if not user_id:
-        return render_to_response('error.html', {'error': 'You have to <a href="/login/">log in</a> to edit spirit scores.'})
+        return render_to_response('error_login.html')
 
     # user_team_ids=request.session.get('user_teamids',None)
     # if (team_idx_giving == u'1' and not game['team_1_id'] in user_team_ids):
