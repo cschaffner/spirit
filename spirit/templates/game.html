@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load staticfiles %}
 
 {% block content %}
 <!-- <script type="text/javascript" src="/static/jscript/jquery-latest.js"></script>
@@ -10,7 +11,9 @@ $(document).ready(function()
 		$("#Teams").tablesorter( {sortList: [[0,0], [1,0]]} );
 	}
 );</script> -->
-<h1>Spirit scores of game {{game.id}}</h1>
+<h1>Spirit scores of game {{game.id}}
+<a href="{{ game.leaguevine_url }}" target="_blank"><img src="{% static "images/favicon.ico" %}"></img></a>
+</h1>
 
 <div>League: {{game.season.league.name}}</div>
 <div>Season: <a href="/season/{{game.season_id}}">{{game.season.name}}</a></div>

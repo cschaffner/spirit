@@ -1,7 +1,10 @@
 {% extends "overview.html" %}
+{% load staticfiles %}
 
 {% block title %}
-<h1>Spirit scores of Season {{id}}</h1>
+<h1>Spirit scores of Season {{id}}
+<a href="{{ info.leaguevine_url }}" target="_blank"><img src="{% static "images/favicon.ico" %}"></img></a>
+</h1>
 
 Spirit scores are computed based on {{games|length}} games in this season.
 

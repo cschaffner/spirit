@@ -1,8 +1,11 @@
 {% extends "overview.html" %}
 {% load tz %}
+{% load staticfiles %}
 
 {% block title %}
-<h1>Spirit scores of Tournament {{info.name}}</h1>
+<h1>Spirit scores of Tournament {{info.name}}
+<a href="{{ info.leaguevine_url }}" target="_blank"><img src="{% static "images/favicon.ico" %}"></img></a>
+</h1>
 
 <p>Spirit scores are computed based on {{games|length}} game{{ games|pluralize }} in this tournament.</p>
 

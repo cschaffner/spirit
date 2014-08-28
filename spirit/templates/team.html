@@ -1,17 +1,19 @@
 {% extends "base.html" %}
 {% load tz %}
+{% load staticfiles %}
 
 {% block content %}
 
-<h1>Team page of {{team.name}}</h1>
-<h6>Season: <a href="/season/{{team.season.id}}">{{team.season.name}}</a>, {{team.season.league.name}}</h6>
-
+<h1>Team page of {{team.name}}
+<a href="{{ team.leaguevine_url }}" target="_blank"><img src="{% static "images/favicon.ico" %}"></img></a></h6>
+</h1>
+<h6>Season: <a href="/season/{{team.season.id}}">{{team.season.name}}</a>, {{team.season.league.name}}
 <hr />
+
+<h2>Previous Games:</h2>
 <div class="alert alert-info">
 Click on a date in order to edit all spirit scores handed out on that date.
 </div>
-
-<h2>Previous Games:</h2>
 
 <table class="table table-striped">
   <thead>
