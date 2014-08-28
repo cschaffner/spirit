@@ -106,6 +106,16 @@ def api_post(url, dict):
     return response.json()
 
 
+def api_delete(url):
+    response = session.delete(url)
+    if response.status_code != requests.codes.no_content:
+        logger.error(response.status_code)
+        logger.error(response.text)
+        # response.raise_for_status()
+    return response
+
+
+
 def api_put(url, dict):
     response = session.put(url, data=json.dumps(dict))
     if response.status_code != requests.codes.accepted:
@@ -647,7 +657,20 @@ def api_addpool(tournament_id,starttime,name,team_ids=[],time_between_rounds=120
                    "generate_matchups": generate_matchups,
                    "team_ids": team_ids}
     return api_post(url,pool_dict)    
-    
+
+def api_getspiritbyid(score_id):
+    url = '{0}/v1/game_sportsmanship_scores/{1}/'.format(settings.HOST, score_id)
+    response = session.get(url)
+    return response.json()
+
+
+def api_deletespirit(score_id):
+    url = '{0}/v1/game_sportsmanship_scores/{1}/'.format(settings.HOST, score_id)
+    response = api_delete(url)
+    return response
+
+
+
 def api_addspirit(game_id,data_dict):
     url='{0}/v1/game_sportsmanship_scores/'.format(settings.HOST)
     data_dict['game_id']=game_id

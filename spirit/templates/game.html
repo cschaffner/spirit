@@ -16,10 +16,13 @@ $(document).ready(function()
 <div>Season: <a href="/season/{{game.season_id}}">{{game.season.name}}</a></div>
 <div>Tournament: <a href="/tournament/{{game.tournament_id}}">{{game.tournament.name}}</a></div>
 <div>Start Time: {{game.start_time}}</div>
-<div>Field: {{game.game_site_id}}</div>
+<div>Field: {{game.game_site.name}}</div>
 
 <div>Team 1: <a href="/team/{{game.team_1_id}}/">{{game.team_1.name}}</a></div>
 <div>Team 2: <a href="/team/{{game.team_2_id}}/">{{game.team_2.name}}</a></div>
+
+<div>Game Score: {{game.team_1_score}} - {{game.team_2_score}}</div>
+<br>
 
 <div>Spirit of Team 1: {{game.team_1_spirit}} 
     {% if user_first_name %}<a href="/game/{{game.id}}/submit/2/">Edit</a>{% endif %}
@@ -48,6 +51,8 @@ $(document).ready(function()
 	<div>team 1 comment received: {{s.team_1_comment}}</div>
 	<div>team 2 received: {{s.team_2_score}}</div>
 	<div>team 2 comment received: {{s.team_2_comment}}</div>
+    {% if s.created_by.id == user_id %}<a href="/delete/{{ s.id }}/" type="button" class="btn btn-danger">
+    Delete this spirit score</a>{% endif %}
 </div>
 <p>
 {% endfor %}

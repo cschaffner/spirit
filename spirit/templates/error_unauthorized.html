@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block user %}{% endblock user %}
+{% block content %}
+<h2>Failed to delete spirit score</h2>
+<div class="alert alert-warning">
+	You have to <a href="/login/">log in</a> to delete spirit scores. Furthermore, you can only delete spirit scores
+that you have created yourself. However, you can always enter a new score. Keep in mind that all your actions are
+tracked and visible to the world.
+</div>
+
+{% endblock content %}

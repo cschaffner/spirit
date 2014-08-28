@@ -368,6 +368,7 @@ def game(request, game_id):
 
     return render_to_response('game.html', {'loginurl': settings.LOGINURL,
                                             'user_first_name': user_first_name,
+                                            'user_id': user_id,
                                             'game': game, 'spirit': spirit})
 
 
@@ -466,6 +467,21 @@ def game_submit(request, game_id, team_idx_giving):
         'team_receiving': team_receiving
     })
 
+def delete(request, score_id):
+    spirit_score = api_getspiritbyid(score_id)
+    game_id = spirit_score.get('game_id', None)
+    if not game_id:
+        return render_to_response('error.html',
+              {'error': 'Spirit score with id {0} does not exist and can therefore not be deleted.'.format(score_id)})
+    response = api_deletespirit(score_id)
+    if response.status_code > 400:
+        return render_to_response('error_unauthorized.html')
+
+    # after adding a new spirit score, all bets about caching are off, we have to clear the cache
+    # TODO: be more clever here and only clear affected caches...
+    cache.clear()
+
+    return HttpResponseRedirect('/game/{0}/'.format(game_id))  # Redirect after POST
 
 def TeamsFromGames(spirit, games):
     # first go through the whole list and fill in missing team_id's
