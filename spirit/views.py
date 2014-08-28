@@ -34,6 +34,13 @@ def home(request):
         context['team_players'] = api_team_playersbyplayer(user_id)['objects']
         return render_to_response('spirit_loggedin.html', context)
 
+def instructions(request):
+    user_id = request.session.get('user_id', None)
+    user_first_name = request.session.get('user_first_name', None)
+    return render_to_response('instructions.html',
+        {'user_first_name': user_first_name,
+         'user_id': user_id})
+
 
 def login(request):
 # #  disable

@@ -20,7 +20,7 @@ urlpatterns = patterns('',
     url(r'^game/(\d+)/$', 'spirit.views.game'),
     url(r'^delete/(\d+)/$', 'spirit.views.delete'),
     url(r'^game/(\d+)/submit/([1|2])/$', 'spirit.views.game_submit'),
-    url(r'^instructions/$', TemplateView.as_view(template_name="instructions.html")),
+    url(r'^instructions/$', 'spirit.views.instructions'),
 
 
     # url(r'^spirit/', include('spirit.foo.urls')),
