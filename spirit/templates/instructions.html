@@ -4,25 +4,6 @@
 {% block content %}
 <h2>Instructions</h2>
 
-<h3>General</h3>
-<p>All data presented on this site is served from the <a href="https://www.leaguevine.com/">leaguevine</a> database.
-    The sole purpose of this site is to display and edit
-    <b>spirit scores</b> of Ultimate games according to
-    <a href="http://wfdf.org/news-media/news/press/2-official-communication/580-wfdf-sotg-committee-approves-revisions-to-the-spirit-scoring-system">WFDF 2014</a> rules.
-    If you want to change anything else than spirit scores (teams, matchups, game scores, etc.), you have to make these changes
-    directly on the <a href="https://www.leaguevine.com/">main leaguevine site</a>. Clicking on the Leaguevine logo
-<a href="https://www.leaguevine.com/" target="_blank"><img src="{% static "images/favicon.ico" %}"></img></a> will get you
-ot the corresponding leaguevine pages.</p>
-
-<h3>Viewing spirit scores</h3>
-You can view spirit overviews of games, tournaments and seasons by selecting the according items in the top toolbar.
-    If you know their leaguevine ids, you can also enter the URLs as follows:
-<ul>
-	<li><a href="/game/87018/">/game/87018/</a></li>
-	<li><a href="/tournament/19660/">/tournament/19660/</a></li>
-	<li><a href="/season/20494/">/season/20494/</a></li>
-</ul>
-
 <h3>Adding and editing spirit scores</h3>
 <p>To be able to add and edit spirit scores, you need to <a href="/login/">log in</a> to Leaguevine.
     You can do that using the dropdown menu in the top bar, click on "not logged in", and select log in from the menu.
@@ -47,10 +28,31 @@ You can view spirit overviews of games, tournaments and seasons by selecting the
     for instance <a href="/team/26546/2014-09-07/">/team/26546/2014-09-07/</a></p>
 
 
+<h3>Viewing spirit scores</h3>
+You can view spirit overviews of games, tournaments and seasons by selecting the according items in the top toolbar.
+    If you know their leaguevine ids, you can also enter the URLs as follows:
+<ul>
+	<li><a href="/game/87018/">/game/87018/</a></li>
+	<li><a href="/tournament/19660/">/tournament/19660/</a></li>
+	<li><a href="/season/20494/">/season/20494/</a></li>
+</ul>
+
+
 <h3>Deleting spirit scores</h3>
 <p>You can remove spirit scores from a <a href="/game/87018/">game view</a>. If you are logged in, a red delete button
     will appear along next to those spirit scores that you have entered yourself. You can delete them by
     clicking this button.</p>
+
+
+<h3>General</h3>
+<p>All data presented on this site is served from the <a href="https://www.leaguevine.com/">leaguevine</a> database.
+    The sole purpose of this site is to display and edit
+    <b>spirit scores</b> of Ultimate games according to
+    <a href="http://wfdf.org/news-media/news/press/2-official-communication/580-wfdf-sotg-committee-approves-revisions-to-the-spirit-scoring-system">WFDF 2014</a> rules.
+    If you want to change anything else than spirit scores (teams, matchups, game scores, etc.), you have to make these changes
+    directly on the <a href="https://www.leaguevine.com/">main leaguevine site</a>. Clicking on the Leaguevine logo
+<a href="https://www.leaguevine.com/" target="_blank"><img src="{% static "images/favicon.ico" %}"></img></a> will get you
+ot the corresponding leaguevine pages.</p>
 
 
 {% endblock content %}
