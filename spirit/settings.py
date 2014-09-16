@@ -19,7 +19,7 @@ CACHE_TIME = 60 * 60 * 24 * 1 # 1 day
 HOST="https://api.leaguevine.com"
 # HOST = "http://api.localhost:8000"
 
-ALLOWED_HOSTS = ['spiritapp.herokuapp.com']
+ALLOWED_HOSTS = ['spiritapp.herokuapp.com', 'spirit.leaguevine.com']
 
 
 # expects credentials to be stored in environmental variables!
