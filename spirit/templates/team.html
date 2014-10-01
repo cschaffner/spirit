@@ -36,7 +36,7 @@ Click on a date in order to edit all spirit scores handed out on that date.
     {% if user_first_name %}
         <td><a title="edit all spirit scores of {{ g.datetime|date:"d M" }}" href="/team/{{ team.id }}/{{ g.datetime|date:"Y-m-d" }}/">{{g.datetime|date:"D d M H:i e"}} </a></td>
     {% else %}
-        <td>{{g.datetime|date:"D d H:i"}}</td>
+        <td>{{g.datetime|date:"D d M y, H:i"}}</td>
     {% endif %}
     {% endlocaltime %}
     <td><a href="/team/{{g.opp_id}}/">{{g.opp.name}}</a></td>
