@@ -20,7 +20,10 @@ logging.basicConfig(level=logging.DEBUG)
 # Get an instance of a logger
 logger = logging.getLogger('spirit')
 
+# This is asking for trouble here, sessions with different users might get mixed up!
+# Always use the access token in the request.session instead!!!
 access_token = cache.get('access_token')
+
 # if access_token is None:
 #     # Make a request for an access_token
 #     if settings.OFFLINE:
@@ -50,7 +53,7 @@ def api_token_from_code(request, code):
     # parse string into Python dictionary
     r_dict = r.json()
     access_token = r_dict.get('access_token')
-    request.session['access_token']=access_token
+    request.session['access_token'] = access_token
     cache.set('access_token', access_token)
     logger.info('retrieved a new access token: {0}'.format(access_token))
     
