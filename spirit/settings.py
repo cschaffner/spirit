@@ -12,7 +12,7 @@ OFFLINE = False
 #     pass
 
 CACHES = memcacheify()
-CACHE_TIME = 60 * 60 * 24 * 1 # 1 day
+CACHE_TIME = 60 * 60 * 24 * 5 # 5 days
 
 # allows to switch between the real and the testing leaguevine server
 #HOST="http://api.playwithlv.com"
