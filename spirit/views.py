@@ -164,6 +164,7 @@ def team_date(request, team_id, year, month, day):
 
     user_id = request.session.get('user_id', None)
     user_first_name = request.session.get('user_first_name', None)
+    access_token = request.session('access_token', None)
 
     if not user_id:
         return render_to_response('error_login.html')
@@ -187,7 +188,7 @@ def team_date(request, team_id, year, month, day):
                 else:
                     data['team_1_score'] = scores
                     data['team_1_comment'] = form.cleaned_data['spirit_comment']
-                logger.info(api_addspirit(game['id'], data))
+                logger.info(api_addspirit(access_token, game['id'], data))
 
             return HttpResponseRedirect('/team/{0}/'.format(team['id']))  # Redirect after POST
     else:
@@ -393,6 +394,7 @@ def game_submit(request, game_id, team_idx_giving):
 
     user_id = request.session.get('user_id', None)
     user_first_name = request.session.get('user_first_name', None)
+    access_token = request.sesstion.get('access_token', None)
     if not user_id:
         return render_to_response('error_login.html')
 
@@ -419,7 +421,7 @@ def game_submit(request, game_id, team_idx_giving):
             elif team_idx_giving == u'2':
                 data['team_1_score'] = scores
                 data['team_1_comment'] = form.cleaned_data['spirit_comment']
-            logger.info(api_addspirit(game['id'], data))
+            logger.info(api_addspirit(access_token, game['id'], data))
 
             return HttpResponseRedirect('/game/{0}/'.format(game_id))  # Redirect after POST
     else:

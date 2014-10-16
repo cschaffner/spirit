@@ -100,18 +100,23 @@ def api_post(access_token, url, dict):
 #     return response
 #
 
-# def api_put(url, dict):
-#     response = session.put(url, data=json.dumps(dict))
-#     if response.status_code != requests.codes.accepted:
-#         logger.error(response.status_code)
-#         logger.error(response.text)
-#         response.raise_for_status()
-#
-#     logger.info(pformat(response.json()))
-#     return response.json()
-#
+def api_put(access_token, url, dict):
+    session = requests.Session()
+    session.headers.update({'Authorization': 'bearer {0}'.format(access_token),
+                              'Content-Type': 'application/json',
+                              'Accept': 'application/json'})
 
-def api_update(url, updatedict={}):
+    response = session.put(url, data=json.dumps(dict))
+    if response.status_code != requests.codes.accepted:
+        logger.error(response.status_code)
+        logger.error(response.text)
+        response.raise_for_status()
+
+    logger.info(pformat(response.json()))
+    return response.json()
+
+
+def api_update(access_token, url, updatedict={}):
     # first retrieves the data of an object
     # then merges the fields with updatedict
     # and PUTs it again
@@ -135,7 +140,7 @@ def api_update(url, updatedict={}):
     new_dict.update(updatedict)
     logger.info('after updating: {0}'.format(pformat(new_dict)))
 
-    return api_put(url, new_dict)
+    return api_put(access_token, url, new_dict)
 
 
 def api_me(access_token):
@@ -658,17 +663,17 @@ def api_setteamsingame(game_id, team_1_id, team_2_id):
 #     return api_put(url, game_dict)
 
 
-def api_addpool(tournament_id, starttime, name, team_ids=[], time_between_rounds=120, generate_matchups=False):
-    # create the pool
-    url = '{0}/v1/pools/'.format(settings.HOST)
-    pool_dict = {"tournament_id": tournament_id,
-                 "start_time": "{0}".format(starttime),
-                 "name": "{0}".format(name),
-                 "time_between_rounds": "{0}".format(time_between_rounds),
-                 "generate_matchups": generate_matchups,
-                 "team_ids": team_ids}
-    return api_post(url, pool_dict)
-
+# def api_addpool(tournament_id, starttime, name, team_ids=[], time_between_rounds=120, generate_matchups=False):
+#     # create the pool
+#     url = '{0}/v1/pools/'.format(settings.HOST)
+#     pool_dict = {"tournament_id": tournament_id,
+#                  "start_time": "{0}".format(starttime),
+#                  "name": "{0}".format(name),
+#                  "time_between_rounds": "{0}".format(time_between_rounds),
+#                  "generate_matchups": generate_matchups,
+#                  "team_ids": team_ids}
+#     return api_post(url, pool_dict)
+#
 
 def api_getspiritbyid(score_id):
     url = '{0}/v1/game_sportsmanship_scores/{1}/'.format(settings.HOST, score_id)
@@ -694,7 +699,7 @@ def api_deletespirit(access_token, score_id):
 def api_addspirit(access_token, game_id, data_dict):
     url = '{0}/v1/game_sportsmanship_scores/'.format(settings.HOST)
     data_dict['game_id'] = game_id
-    response = api_post(url, data_dict)
+    response = api_post(access_token, url, data_dict)
     # after adding a new spirit score, all bets about caching are off, we have to clear the cache
     # TODO: be more clever here and only clear affected caches...
     cache.clear()
