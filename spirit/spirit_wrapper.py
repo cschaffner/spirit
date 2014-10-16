@@ -20,6 +20,10 @@ logging.basicConfig(level=logging.DEBUG)
 # Get an instance of a logger
 logger = logging.getLogger('spirit')
 
+session = requests.Session()
+session.headers.update({'Content-Type': 'application/json',
+                        'Accept': 'application/json'})
+
 
 def api_token_from_code(request, code):
     global my_headers

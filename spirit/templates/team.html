@@ -7,7 +7,7 @@
 <h1>Team page of {{team.name}}
 <a href="{{ team.leaguevine_url }}" target="_blank"><img src="{% static "images/favicon.ico" %}"></img></a></h6>
 </h1>
-<h6>Season: <a href="/season/{{team.season.id}}">{{team.season.name}}</a>, {{team.season.league.name}}
+<h6>Season: <a href="/seasons/{{team.season.id}}">{{team.season.name}}</a>, {{team.season.league.name}}
 <hr />
 
 <h2>Previous Games:</h2>
@@ -34,22 +34,22 @@ When logged in, click on a date in order to edit all spirit scores handed out on
     <td>{{g.game_site.name}}</td>
     {% localtime off %}
     {% if user_first_name %}
-        <td><a title="edit all spirit scores of {{ g.datetime|date:"d M" }}" href="/team/{{ team.id }}/{{ g.datetime|date:"Y-m-d" }}/">{{g.datetime|date:"D d M H:i e"}} </a></td>
+        <td><a title="edit all spirit scores of {{ g.datetime|date:"d M" }}" href="/teams/{{ team.id }}/{{ g.datetime|date:"Y-m-d" }}/">{{g.datetime|date:"D d M H:i e"}} </a></td>
     {% else %}
         <td>{{g.datetime|date:"D d M y, H:i"}}</td>
     {% endif %}
     {% endlocaltime %}
-    <td><a href="/team/{{g.opp_id}}/">{{g.opp.name}}</a></td>
-    <td><a href="/game/{{g.id}}/">{{g.score_string}}</a></td>
+    <td><a href="/teams/{{g.opp_id}}/">{{g.opp.name}}</a></td>
+    <td><a href="/games/{{g.id}}/">{{g.score_string}}</a></td>
     <td{% if not g.spirit_given %} class="danger"{% endif %}>{% if g.spirit_given %}<span title="[rules, fouls, fairness, attitude, communication]">{{g.spirit_given}}</span>{% else %}&nbsp;{% endif %}</td>
     <td{% if not g.spirit_received %} class="danger"{% endif %}>{% if g.spirit_received %}<span title="[rules, fouls, fairness, attitude, communication]">{{g.spirit_received}}</span>{% else %}&nbsp;{% endif %}</td>
     {% if user_first_name %}
         <td>
-          <a href="/game/{{g.id}}/submit/{{g.my_team}}/" class="btn btn-success ww-tooltip" title="give to {{g.opp.name}}">give</a>
-          <a href="/game/{{g.id}}/submit/{{g.opp_team}}/" class="btn btn-info ww-tooltip" title="receive from {{g.opp.name}}">receive</a>
+          <a href="/games/{{g.id}}/submit/{{g.my_team}}/" class="btn btn-success ww-tooltip" title="give to {{g.opp.name}}">give</a>
+          <a href="/games/{{.id}}/submit/{{g.opp_team}}/" class="btn btn-info ww-tooltip" title="receive from {{g.opp.name}}">receive</a>
         </td>
     {% endif %}
-    <td><a href="/tournament/{{g.tournament.id}}/" title="{{g.tournament.name}}"><i class="fa fa-dot-circle-o"></i></a></td>
+    <td><a href="/tournaments/{{g.tournament.id}}/" title="{{g.tournament.name}}"><i class="fa fa-dot-circle-o"></i></a></td>
   </tr>
 {% endfor %}
   </tbody>

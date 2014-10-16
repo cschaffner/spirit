@@ -4,7 +4,7 @@
 <h3>{{ user_first_name }}'s Teams</h3>
 <ul>
 {% for t in team_players %}
-<li><a href="team/{{t.team_id}}/">{{t.team.name}}</a> ({{t.team.season.name}}, {{t.team.season.league.name}})</li>
+<li><a href="teams/{{t.team_id}}/">{{t.team.name}}</a> ({{t.team.season.name}}, {{t.team.season.league.name}})</li>
 {% endfor %}
 </ul>
 {% endblock %}

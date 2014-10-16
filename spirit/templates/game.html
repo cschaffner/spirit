@@ -16,25 +16,25 @@ $(document).ready(function()
 </h1>
 
 <div>League: {{game.season.league.name}}</div>
-<div>Season: <a href="/season/{{game.season_id}}">{{game.season.name}}</a></div>
-<div>Tournament: <a href="/tournament/{{game.tournament_id}}">{{game.tournament.name}}</a></div>
+<div>Season: <a href="/seasons/{{game.season_id}}">{{game.season.name}}</a></div>
+<div>Tournament: <a href="/tournaments/{{game.tournament_id}}">{{game.tournament.name}}</a></div>
 <div>Start Time: {{game.start_time}}</div>
 <div>Field: {{game.game_site.name}}</div>
 
-<div>Team 1: <a href="/team/{{game.team_1_id}}/">{{game.team_1.name}}</a></div>
-<div>Team 2: <a href="/team/{{game.team_2_id}}/">{{game.team_2.name}}</a></div>
+<div>Team 1: <a href="/teams/{{game.team_1_id}}/">{{game.team_1.name}}</a></div>
+<div>Team 2: <a href="/teams/{{game.team_2_id}}/">{{game.team_2.name}}</a></div>
 
 <div>Game Score: {{game.team_1_score}} - {{game.team_2_score}}</div>
 <br>
 
 <div>Spirit of Team 1: {{game.team_1_spirit}} 
-    {% if user_first_name %}<a href="/game/{{game.id}}/submit/2/">Edit</a>{% endif %}
+    {% if user_first_name %}<a href="/games/{{game.id}}/submit/2/">Edit</a>{% endif %}
 </div>
 <div>Spirit Comment for Team 1: {{game.team_1_comment}}</div>
 
 
 <div>Spirit of Team 2: {{game.team_2_spirit}}
-	{% if user_first_name %}<a href="/game/{{game.id}}/submit/1/">Edit</a>{% endif %}</div>
+	{% if user_first_name %}<a href="/games/{{game.id}}/submit/1/">Edit</a>{% endif %}</div>
 <div>Spirit Comments for Team 2: {{game.team_2_comment}}</div>
 
 

@@ -1,6 +1,7 @@
 from django.conf.urls import patterns, include, url
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, RedirectView
+from views import MyRedirectView
 
 # Uncomment the next two lines to enable the admin:
 # from django.contrib import admin
@@ -12,15 +13,19 @@ urlpatterns = patterns('',
     url(r'^logout/$', 'spirit.views.logout'),
     url(r'^login/$', 'spirit.views.login'),
     url(r'^code/$', 'spirit.views.code'),
-    url(r'^season/(\d+)/$', 'spirit.views.season'),
-    url(r'^team/(\d+)/$', 'spirit.views.team'),
-    url(r'^team/(\d+)/(\d+)-(\d+)-(\d+)/$', 'spirit.views.team_date'),
-    url(r'^tournament/(\d+)/$', 'spirit.views.tournament'),
+    url(r'^seasons/(\d+)/$', 'spirit.views.season', name='seasons'),
+    url(r'^teams/(\d+)/$', 'spirit.views.team', name='teams'),
+    url(r'^teams/(\d+)/(\d+)-(\d+)-(\d+)/$', 'spirit.views.team_date'),
+    url(r'^tournaments/(\d+)/$', 'spirit.views.tournament', name='tournaments'),
     url(r'^result/(\d+)/$', 'spirit.views.result'),
-    url(r'^game/(\d+)/$', 'spirit.views.game'),
+    url(r'^games/(\d+)/$', 'spirit.views.game', name='games'),
     url(r'^delete/(\d+)/$', 'spirit.views.delete'),
-    url(r'^game/(\d+)/submit/([1|2])/$', 'spirit.views.game_submit'),
+    url(r'^games/(\d+)/submit/([1|2])/$', 'spirit.views.game_submit'),
     url(r'^instructions/$', 'spirit.views.instructions'),
+    url(r'^team/(?P<id>\d+)/$', MyRedirectView.as_view(url='/teams/')),
+    url(r'^season/(?P<id>\d+)/$', MyRedirectView.as_view(url='/seasons/')),
+    url(r'^game/(?P<id>\d+)/$', MyRedirectView.as_view(url='/games/')),
+    url(r'^tournament/(?P<id>\d+)/$', MyRedirectView.as_view(url='/tournaments/')),
 
 
     # url(r'^spirit/', include('spirit.foo.urls')),

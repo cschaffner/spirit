@@ -9,15 +9,15 @@
 <h3>Recent Tournaments</h3>
 <ul>
     {% for tournament in recent_tournaments %}
-    	<li><a href="/season/{{ tournament.season.id }}/">{{ tournament.season.league.name }} {{ tournament.season.name }}</a>:
-            <a href="/tournament/{{ tournament.id }}/">{{ tournament.name }}</a></li>
+    	<li><a href="/seasons/{{ tournament.season.id }}/">{{ tournament.season.league.name }} {{ tournament.season.name }}</a>:
+            <a href="/tournaments/{{ tournament.id }}/">{{ tournament.name }}</a></li>
     {% endfor %}
 </ul>
 
 <h3>Recent games</h3>
     <ul>
     {% for game in recent_games %}
-    	<li><a href="/game/{{ game.id }}/">{{ game.team_1.name }} - {{ game.team_2.name }}</a></li>
+    	<li><a href="/games/{{ game.id }}/">{{ game.team_1.name }} - {{ game.team_2.name }}</a></li>
     {% endfor %}
     </ul>
 

@@ -4,6 +4,7 @@ from django.http import HttpResponseRedirect
 from django.utils.dateparse import parse_datetime, parse_date
 from django.forms.formsets import formset_factory
 from django.core.cache import cache
+from django.views.generic.base import RedirectView
 
 from operator import itemgetter
 from forms import SpiritForm
@@ -18,6 +19,16 @@ import logging
 
 # Get an instance of a logger
 logger = logging.getLogger('spirit')
+
+
+class MyRedirectView(RedirectView):
+
+    permanent = True
+    query_string = True
+
+    def get_redirect_url(self, *args, **kwargs):
+        url = super(MyRedirectView, self).get_redirect_url(*args, **kwargs)
+        return '{0}{1}/'.format(url, kwargs.get('id', None))
 
 
 def home(request):
@@ -190,7 +201,7 @@ def team_date(request, team_id, year, month, day):
                     data['team_1_comment'] = form.cleaned_data['spirit_comment']
                 logger.info(api_addspirit(access_token, game['id'], data))
 
-            return HttpResponseRedirect('/team/{0}/'.format(team['id']))  # Redirect after POST
+            return HttpResponseRedirect('/teams/{0}/'.format(team['id']))  # Redirect after POST
     else:
         formset = SpiritFormSet()  # Unbound forms
         for form, game in zip(formset, games):
@@ -423,7 +434,7 @@ def game_submit(request, game_id, team_idx_giving):
                 data['team_1_comment'] = form.cleaned_data['spirit_comment']
             logger.info(api_addspirit(access_token, game['id'], data))
 
-            return HttpResponseRedirect('/game/{0}/'.format(game_id))  # Redirect after POST
+            return HttpResponseRedirect('/games/{0}/'.format(game_id))  # Redirect after POST
     else:
         form = SpiritForm()  # An unbound form
         game['datetime'] = parse_datetime(game['start_time'])
@@ -501,7 +512,7 @@ def delete(request, score_id):
     # TODO: be more clever here and only clear affected caches...
     cache.clear()
 
-    return HttpResponseRedirect('/game/{0}/'.format(game_id))  # Redirect after POST
+    return HttpResponseRedirect('/games/{0}/'.format(game_id))  # Redirect after POST
 
 
 def TeamsFromGames(spirit, games):
@@ -600,4 +611,4 @@ def _score_is_valid(score):
 def list_avg(list):
     # takes unicode list of lists and computes average
     return list
-            
+
