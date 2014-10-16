@@ -1,8 +1,11 @@
 from django.conf.urls import patterns, include, url
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.views.generic import TemplateView, RedirectView
-from views import MyRedirectView
+from views import MyRedirectView, season, tournament
+from django.views.decorators.cache import cache_page
 
+
+from settings import CACHE_TIME
 # Uncomment the next two lines to enable the admin:
 # from django.contrib import admin
 # admin.autodiscover()
@@ -13,10 +16,10 @@ urlpatterns = patterns('',
     url(r'^logout/$', 'spirit.views.logout'),
     url(r'^login/$', 'spirit.views.login'),
     url(r'^code/$', 'spirit.views.code'),
-    url(r'^seasons/(\d+)/$', 'spirit.views.season', name='seasons'),
+    url(r'^seasons/(\d+)/$', cache_page(CACHE_TIME)(season), name='seasons'),
     url(r'^teams/(\d+)/$', 'spirit.views.team', name='teams'),
     url(r'^teams/(\d+)/(\d+)-(\d+)-(\d+)/$', 'spirit.views.team_date'),
-    url(r'^tournaments/(\d+)/$', 'spirit.views.tournament', name='tournaments'),
+    url(r'^tournaments/(\d+)/$', cache_page(CACHE_TIME)(tournament), name='tournaments'),
     url(r'^result/(\d+)/$', 'spirit.views.result'),
     url(r'^games/(\d+)/$', 'spirit.views.game', name='games'),
     url(r'^delete/(\d+)/$', 'spirit.views.delete'),
