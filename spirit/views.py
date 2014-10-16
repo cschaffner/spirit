@@ -3,11 +3,17 @@ from django.shortcuts import render_to_response, get_object_or_404, redirect, re
 from django.http import HttpResponseRedirect
 from django.utils.dateparse import parse_datetime, parse_date
 from django.forms.formsets import formset_factory
+from django.core.cache import cache
 
 from operator import itemgetter
 from forms import SpiritForm
-from wrapper import *
+from spirit_wrapper import api_recent_tournaments, api_recent_games, api_team_playersbyplayer, api_token_from_code, \
+    api_teambyid, api_gamesbyteam, api_spiritbygame, api_addspirit, api_seasonbyid, api_spiritbyseason, \
+    api_gamesbyseason, api_tournamentbyid, api_spiritbytournament, api_gamesbytournament, api_gamebyid, \
+    api_getspiritbyid, api_deletespirit
 from pprint import pformat
+import json
+import settings
 import logging
 
 # Get an instance of a logger
@@ -34,17 +40,18 @@ def home(request):
         context['team_players'] = api_team_playersbyplayer(user_id)['objects']
         return render_to_response('spirit_loggedin.html', context)
 
+
 def instructions(request):
     user_id = request.session.get('user_id', None)
     user_first_name = request.session.get('user_first_name', None)
     return render_to_response('instructions.html',
-        {'user_first_name': user_first_name,
-         'user_id': user_id})
+                              {'user_first_name': user_first_name,
+                               'user_id': user_id})
 
 
 def login(request):
-# #  disable
-#     return render_to_response('spirit_wwx.html', {'loginurl': settings.LOGINURL})
+    # #  disable
+    # return render_to_response('spirit_wwx.html', {'loginurl': settings.LOGINURL})
     return redirect(settings.LOGINURL)
 
 
@@ -131,6 +138,7 @@ def team(request, team_id):
                                             'games': games['objects'],
                                             'user_first_name': user_first_name})
 
+
 def team_date(request, team_id, year, month, day):
     team = api_teambyid(team_id)
     all_games = api_gamesbyteam(team_id)
@@ -141,7 +149,8 @@ def team_date(request, team_id, year, month, day):
     games = []
     for game in all_games['objects']:
         game['datetime'] = parse_datetime(game['start_time'])
-        if (game['datetime'].day == int(day) and game['datetime'].month == int(month) and game['datetime'].year == int(year)):
+        if (game['datetime'].day == int(day) and game['datetime'].month == int(month) and game['datetime'].year == int(
+                year)):
             if int(game['team_1_id']) == int(team['id']):
                 game['my_team'] = 1
             elif int(game['team_2_id']) == int(team['id']):
@@ -158,7 +167,6 @@ def team_date(request, team_id, year, month, day):
 
     if not user_id:
         return render_to_response('error_login.html')
-
 
     SpiritFormSet = formset_factory(SpiritForm, extra=len(games))
 
@@ -223,7 +231,6 @@ def team_date(request, team_id, year, month, day):
                             form.fields['spirit_communication'].initial = team_1_scores[4]
                             form.fields['spirit_comment'].initial = score['team_1_comment']
 
-
     return render(request, 'team_date_submit.html', {
         'formset': formset,
         'user_first_name': user_first_name,
@@ -232,8 +239,6 @@ def team_date(request, team_id, year, month, day):
         'month': month,
         'day': day,
     })
-
-
 
 
 def score_string(my_score, opp_score):
@@ -288,7 +293,6 @@ def tournament(request, tournament_id):
     # remove BYE games, as those are irrelevant for spirit scores:
     games['objects'] = [g for g in games['objects'] if g['team_2_id']]
 
-
     if (u'errors' in spirit):
         errmsg = '{0}'.format(spirit['errors'])
         return render_to_response('error.html', {'error': errmsg})
@@ -309,6 +313,7 @@ def tournament(request, tournament_id):
                                                   'teams': teams,
                                                   'info': info})
 
+
 def result(request, tournament_id):
     info = api_tournamentbyid(tournament_id)
     # retrieve all games of this tournament
@@ -316,7 +321,6 @@ def result(request, tournament_id):
     games = api_gamesbytournament(tournament_id)
     # remove BYE games, as those are irrelevant for spirit scores:
     games['objects'] = [g for g in games['objects'] if g['team_2_id']]
-
 
     if (u'errors' in spirit):
         errmsg = '{0}'.format(spirit['errors'])
@@ -351,7 +355,7 @@ def game(request, game_id):
     game['team_2_spirit_editable'] = game['team_1_id'] in user_teamids
     game['team_1_spirit_editable'] = game['team_2_id'] in user_teamids
 
-    #    if user_id != None:
+    # if user_id != None:
     #        # determine from the user_id which team he belongs to
     #        team_players=api_team_playersbyplayer(user_id)
     #        for tp in team_players['objects']:
@@ -387,14 +391,14 @@ def game_submit(request, game_id, team_idx_giving):
         errmsg = '{0}'.format(game_id)
         return render_to_response('error.html', {'error': errmsg})
 
-    user_id=request.session.get('user_id',None)
-    user_first_name=request.session.get('user_first_name', None)
+    user_id = request.session.get('user_id', None)
+    user_first_name = request.session.get('user_first_name', None)
     if not user_id:
         return render_to_response('error_login.html')
 
     # user_team_ids=request.session.get('user_teamids',None)
     # if (team_idx_giving == u'1' and not game['team_1_id'] in user_team_ids):
-    #     return render_to_response('error.html', {'error': 'You have to be a member of team {0} in order to submit this spirit score (and you are not).'.format(game['team_1']['name'])})
+    # return render_to_response('error.html', {'error': 'You have to be a member of team {0} in order to submit this spirit score (and you are not).'.format(game['team_1']['name'])})
     # if (team_idx_giving == u'2' and not game['team_2_id'] in user_team_ids):
     #     return render_to_response('error.html', {'error': 'You have to be a member of team {0} in order to submit this spirit score (and you are not).'.format(game['team_2']['name'])})
 
@@ -457,7 +461,7 @@ def game_submit(request, game_id, team_idx_giving):
                         form.fields['spirit_communication'].initial = team_1_scores[4]
                         form.fields['spirit_comment'].initial = score['team_1_comment']
 
-                    #            form.fields['team_giving'].choices=((1,game['team_1']['name']),(2,game['team_2']['name']))
+                        #            form.fields['team_giving'].choices=((1,game['team_1']['name']),(2,game['team_2']['name']))
 
     if team_idx_giving == u'1':
         team_giving = game['team_1']
@@ -474,13 +478,20 @@ def game_submit(request, game_id, team_idx_giving):
         'team_receiving': team_receiving
     })
 
+
 def delete(request, score_id):
+    access_token = request.session.get('access_token', None)
+    if access_token is None:
+        return render_to_response('error_unauthorized.html')
+
     spirit_score = api_getspiritbyid(score_id)
     game_id = spirit_score.get('game_id', None)
     if not game_id:
         return render_to_response('error.html',
-              {'error': 'Spirit score with id {0} does not exist and can therefore not be deleted.'.format(score_id)})
-    response = api_deletespirit(score_id)
+                                  {
+                                  'error': 'Spirit score with id {0} does not exist and can therefore not be deleted.'.format(
+                                      score_id)})
+    response = api_deletespirit(access_token, score_id)
     if response.status_code > 400:
         return render_to_response('error_unauthorized.html')
 
@@ -489,6 +500,7 @@ def delete(request, score_id):
     cache.clear()
 
     return HttpResponseRedirect('/game/{0}/'.format(game_id))  # Redirect after POST
+
 
 def TeamsFromGames(spirit, games):
     # first go through the whole list and fill in missing team_id's
@@ -562,11 +574,11 @@ def TeamsFromGames(spirit, games):
             teams[id]['avg_received'] = map(lambda x: sum(x) / teams[id]['nr_received'],
                                             zip(*team['received'].values()))
             teams[id]['avg_received_total'] = sum(teams[id]['avg_received'])
-            teams[id]['avg_received'] = map(lambda x: round(x,2), teams[id]['avg_received'])
+            teams[id]['avg_received'] = map(lambda x: round(x, 2), teams[id]['avg_received'])
         if teams[id]['nr_given'] > 0:
             teams[id]['avg_given'] = map(lambda x: sum(x) / teams[id]['nr_given'], zip(*team['given'].values()))
             teams[id]['avg_given_total'] = sum(teams[id]['avg_given'])
-            teams[id]['avg_given'] = map(lambda x: round(x,2), teams[id]['avg_given'])
+            teams[id]['avg_given'] = map(lambda x: round(x, 2), teams[id]['avg_given'])
     logger.debug(pformat(teams))
     return teams, games
 
