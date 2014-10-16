@@ -175,7 +175,7 @@ def team_date(request, team_id, year, month, day):
 
     user_id = request.session.get('user_id', None)
     user_first_name = request.session.get('user_first_name', None)
-    access_token = request.session('access_token', None)
+    access_token = request.session.get('access_token', None)
 
     if not user_id:
         return render_to_response('error_login.html')
@@ -405,7 +405,7 @@ def game_submit(request, game_id, team_idx_giving):
 
     user_id = request.session.get('user_id', None)
     user_first_name = request.session.get('user_first_name', None)
-    access_token = request.sesstion.get('access_token', None)
+    access_token = request.session.get('access_token', None)
     if not user_id:
         return render_to_response('error_login.html')
 

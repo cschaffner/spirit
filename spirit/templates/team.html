@@ -5,9 +5,9 @@
 {% block content %}
 
 <h1>Team page of {{team.name}}
-<a href="{{ team.leaguevine_url }}" target="_blank"><img src="{% static "images/favicon.ico" %}"></img></a></h6>
+<a href="{{ team.leaguevine_url }}" target="_blank"><img src="{% static "images/favicon.ico" %}"></a></h6>
 </h1>
-<h6>Season: <a href="/seasons/{{team.season.id}}">{{team.season.name}}</a>, {{team.season.league.name}}
+<h6>Season: <a href="/seasons/{{team.season.id}}">{{team.season.name}}</a>, {{team.season.league.name}}</h6>
 <hr />
 
 <h2>Previous Games:</h2>
@@ -46,7 +46,7 @@ When logged in, click on a date in order to edit all spirit scores handed out on
     {% if user_first_name %}
         <td>
           <a href="/games/{{g.id}}/submit/{{g.my_team}}/" class="btn btn-success ww-tooltip" title="give to {{g.opp.name}}">give</a>
-          <a href="/games/{{.id}}/submit/{{g.opp_team}}/" class="btn btn-info ww-tooltip" title="receive from {{g.opp.name}}">receive</a>
+          <a href="/games/{{g.id}}/submit/{{g.opp_team}}/" class="btn btn-info ww-tooltip" title="receive from {{g.opp.name}}">receive</a>
         </td>
     {% endif %}
     <td><a href="/tournaments/{{g.tournament.id}}/" title="{{g.tournament.name}}"><i class="fa fa-dot-circle-o"></i></a></td>
