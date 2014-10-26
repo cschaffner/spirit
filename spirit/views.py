@@ -7,6 +7,7 @@ from django.core.cache import cache
 from django.views.generic.base import RedirectView
 
 from operator import itemgetter
+from datetime import datetime, timedelta
 from forms import SpiritForm
 from spirit_wrapper import api_recent_tournaments, api_recent_games, api_team_playersbyplayer, api_token_from_code, \
     api_teambyid, api_gamesbyteam, api_spiritbygame, api_addspirit, api_seasonbyid, api_spiritbyseason, \
@@ -16,6 +17,8 @@ from pprint import pformat
 import json
 import settings
 import logging
+
+
 
 # Get an instance of a logger
 logger = logging.getLogger('spirit')
@@ -204,8 +207,13 @@ def team_date(request, team_id, year, month, day):
             return HttpResponseRedirect('/teams/{0}/'.format(team['id']))  # Redirect after POST
     else:
         formset = SpiritFormSet()  # Unbound forms
+        warning = None
         for form, game in zip(formset, games):
             form.fields['game_start'].initial = game['datetime']
+            if game['datetime'] > datetime.now(game['datetime'].tzinfo):
+                warning = 'One of the games has not started yet!'
+            elif game['datetime'] < datetime.now(game['datetime'].tzinfo) - timedelta(settings.ALLOWED_DAYS_TO_ENTER):
+                warning = 'One of the games was played already more than {0} days ago!'.format(settings.ALLOWED_DAYS_TO_ENTER)
             if game['tournament']:
                 form.fields['occasion'].initial = game['tournament']['name']
             if game['swiss_round_id']:
@@ -250,6 +258,7 @@ def team_date(request, team_id, year, month, day):
         'year': year,
         'month': month,
         'day': day,
+        'warning': warning,
     })
 
 
@@ -439,6 +448,11 @@ def game_submit(request, game_id, team_idx_giving):
         form = SpiritForm()  # An unbound form
         game['datetime'] = parse_datetime(game['start_time'])
         form.fields['game_start'].initial = game['datetime']
+        warning = None
+        if game['datetime'] > datetime.now(game['datetime'].tzinfo):
+            warning = 'Game has not started yet!'
+        elif game['datetime'] < datetime.now(game['datetime'].tzinfo) - timedelta(settings.ALLOWED_DAYS_TO_ENTER):
+            warning = 'Game was played already more than {0} days ago!'.format(settings.ALLOWED_DAYS_TO_ENTER)
         if game['tournament']:
             form.fields['occasion'].initial = game['tournament']['name']
         if game['swiss_round_id']:
@@ -488,7 +502,8 @@ def game_submit(request, game_id, team_idx_giving):
         'user_first_name': user_first_name,
         'team_giving': team_giving,
         'team_idx_giving': team_idx_giving,
-        'team_receiving': team_receiving
+        'team_receiving': team_receiving,
+        'warning': warning,
     })
 
 

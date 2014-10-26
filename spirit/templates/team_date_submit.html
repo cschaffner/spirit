@@ -9,6 +9,12 @@
 
   <div class="row">
     <div class="col-md-12">
+        {% if warning %}
+            <div class="alert alert-warning">
+                Suspicious action: {{ warning }} This spirit score update will be reported to the tournament administrators.
+            </div>
+        {% endif %}
+
       <h2><a href="/teams/{{ team.id }}/" class="label label-primary">{{team.name}}</a></h2>
       <br />
         <form method="post" action="/teams/{{ team.id }}/{{ year }}-{{ month }}-{{ day }}/">
@@ -55,6 +61,21 @@
 
 {% block post %}
   {{ block.super }}
+  {% if warning %}
+      <script>
+        $('form').submit(function(e) {
+            var currentForm = this;
+            e.preventDefault();
+            bootbox.confirm("Suspicious action: {{ warning }} This spirit score update will be reported to the tournament administrators. Do you really want to submit?", function(result) {
+                if (result) {
+                    currentForm.submit();
+                }
+            });
+        });
+      </script>
+  {% endif %}
+
+
   <script type="text/javascript">
     $(function() {
       $("div.radio").each(function() {

@@ -7,15 +7,16 @@
 {% endblock %}
 
 {% block content %}
-{#  <style type="text/css">#}
-{#    .form-group {#}
-{#      width: 50%;#}
-{#      float: left;#}
-{#      overflow: hidden;#}
-{#    }#}
-{#  </style>#}
+
   <div class="row">
+
     <div class="col-md-8">
+        {% if warning %}
+            <div class="alert alert-warning">
+                Suspicious action: {{ warning }} This spirit score update will be reported to the tournament administrators.
+            </div>
+        {% endif %}
+
       <h2><a href="/teams/{{ team_giving.id }}/" class="label label-primary">{{team_giving.name}}</a> gives
           <a href="/teams/{{ team_receiving.id }}/" class="label label-info">{{team_receiving.name}}</a></h2>
       <br />
@@ -24,7 +25,7 @@
             <div class="row">
                 {{ form|bootstrap }}
             </div>
-            <input type="submit" value="Submit" class="btn btn-primary btn-lg" />
+            <input type="submit" value="Submit" class="btn btn-primary btn-lg"/>
       </form>
 
     </div>
@@ -49,10 +50,25 @@
   </div>
 
 
+
 {% endblock content %}
 
 {% block post %}
   {{ block.super }}
+  {% if warning %}
+      <script>
+        $('form').submit(function(e) {
+            var currentForm = this;
+            e.preventDefault();
+            bootbox.confirm("Suspicious action: {{ warning }} This spirit score update will be reported to the tournament administrators. Do you really want to submit?", function(result) {
+                if (result) {
+                    currentForm.submit();
+                }
+            });
+        });
+      </script>
+  {% endif %}
+
   <script type="text/javascript">
     $(function() {
       $("div.radio").each(function() {

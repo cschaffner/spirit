@@ -6,6 +6,9 @@ ROOT_PATH = os.path.dirname(__file__)
 
 OFFLINE = False
 
+# the number of days allowed after which spirit scores can still be entered with raising suspicion
+ALLOWED_DAYS_TO_ENTER = 14
+
 # try:
 #     from local_settings import *
 # except ImportError, e:
