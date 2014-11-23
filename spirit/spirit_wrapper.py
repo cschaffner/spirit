@@ -319,6 +319,10 @@ def api_gamesbyseason(season_id):
     url = '{0}/v1/games/?limit=200&season_id={1}'.format(settings.HOST, season_id)
     return api_get(url)
 
+def api_gamesbyseason_restricted(season_id):
+    url = '{0}/v1/games/?limit=200&season_id={1}&fields=%5Bid%2Cteam_1%2Cteam_2%2Cteam_1_score%2Cteam_2_score%2Cstart_time%2Cgame_site%5D'.format(settings.HOST, season_id)
+    return api_get(url)
+
 
 def api_gamesbyteam(team_id):
     url = '{0}/v1/games/?limit=10&team_ids=%5B{1}%5D&order_by=%5B-start_time%5D'.format(settings.HOST, team_id)
@@ -361,7 +365,7 @@ def api_rankedteamids(tournament_id, round_number):
 def api_url(url):
     response = session.get(url)
     response_dict = response.json()
-    logger.info(response_dict)
+    # logger.info(response_dict)
     return response_dict
 
 

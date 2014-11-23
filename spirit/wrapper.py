@@ -350,7 +350,7 @@ def api_rankedteamids(tournament_id,round_number):
 def api_url(url):
     response = session.get(url)
     response_dict = response.json()
-    logger.info(response_dict)
+    # logger.info(response_dict)
     return response_dict
     
 

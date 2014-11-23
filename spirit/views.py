@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 from forms import SpiritForm
 from spirit_wrapper import api_recent_tournaments, api_recent_games, api_team_playersbyplayer, api_token_from_code, \
     api_teambyid, api_gamesbyteam, api_spiritbygame, api_addspirit, api_seasonbyid, api_spiritbyseason, \
-    api_gamesbyseason, api_tournamentbyid, api_spiritbytournament, api_gamesbytournament, api_gamebyid, \
+    api_gamesbyseason_restricted, api_tournamentbyid, api_spiritbytournament, api_gamesbytournament, api_gamebyid, \
     api_getspiritbyid, api_deletespirit
 from pprint import pformat
 import json
@@ -277,11 +277,11 @@ def season(request, season_id):
     info = api_seasonbyid(season_id)
     # retrieve all games of this season
     spirit = api_spiritbyseason(season_id)
-    games = api_gamesbyseason(season_id)
+    games = api_gamesbyseason_restricted(season_id)
     # remove BYE games, as those are irrelevant for spirit scores:
     games['objects'] = [g for g in games['objects'] if g['team_2_id']]
 
-    logger.info(pformat(spirit))
+    # logger.info(pformat(spirit))
 
     if (u'errors' in spirit):
         errmsg = '{0}'.format(spirit['errors'])
