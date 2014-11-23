@@ -278,14 +278,15 @@ def season(request, season_id):
     # retrieve all games of this season
     spirit = api_spiritbyseason(season_id)
     games = api_gamesbyseason_restricted(season_id)
-    # remove BYE games, as those are irrelevant for spirit scores:
-    games['objects'] = [g for g in games['objects'] if g['team_2_id']]
 
     # logger.info(pformat(spirit))
 
     if (u'errors' in spirit):
         errmsg = '{0}'.format(spirit['errors'])
         return render_to_response('error.html', {'error': errmsg})
+
+    # remove BYE games, as those are irrelevant for spirit scores:
+    games['objects'] = [g for g in games['objects'] if g['team_2_id']]
 
     user_id = request.session.get('user_id', None)
     user_first_name = request.session.get('user_first_name', None)
@@ -311,12 +312,12 @@ def tournament(request, tournament_id):
     # retrieve all games of this tournament
     spirit = api_spiritbytournament(tournament_id)
     games = api_gamesbytournament(tournament_id)
-    # remove BYE games, as those are irrelevant for spirit scores:
-    games['objects'] = [g for g in games['objects'] if g['team_2_id']]
-
     if (u'errors' in spirit):
         errmsg = '{0}'.format(spirit['errors'])
         return render_to_response('error.html', {'error': errmsg})
+
+    # remove BYE games, as those are irrelevant for spirit scores:
+    games['objects'] = [g for g in games['objects'] if g['team_2_id']]
 
     user_id = request.session.get('user_id', None)
     user_first_name = request.session.get('user_first_name', None)

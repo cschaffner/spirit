@@ -64,18 +64,19 @@ def api_get(url):
         response_dict = response.json()
         cache.set(url, response_dict, CACHE_TIME)
 
-    objects = response_dict['objects']
-    while response_dict['meta']['next'] != None:
-        next_url = response_dict['meta']['next']
-        if cache.get(next_url):
-            response_dict = cache.get(next_url)
-        else:
-            response = session.get(next_url)
-            logger.info(response.elapsed)
-            response_dict = response.json()
-        objects = objects + response_dict['objects']
-    response_dict['objects'] = objects
-    cache.set(url, response_dict, CACHE_TIME)
+    if 'objects' in response_dict:
+        objects = response_dict['objects']
+        while response_dict['meta']['next'] != None:
+            next_url = response_dict['meta']['next']
+            if cache.get(next_url):
+                response_dict = cache.get(next_url)
+            else:
+                response = session.get(next_url)
+                logger.info(response.elapsed)
+                response_dict = response.json()
+            objects = objects + response_dict['objects']
+        response_dict['objects'] = objects
+        cache.set(url, response_dict, CACHE_TIME)
     return response_dict
 
 
