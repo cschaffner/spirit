@@ -55,28 +55,59 @@ def api_token_from_code(request, code):
 
 
 def api_get(url):
-    if cache.get(url):
-        logger.debug('returning cached data ({0} bytes) from URL: {1}'.format(getsizeof(cache.get(url)), url))
-        response_dict = cache.get(url)
+    from urlparse import urlparse, parse_qs, urlunparse
+    from urllib import urlencode
+    query_dict = parse_qs(urlparse(url).query)
+
+    url_parts = urlparse(url)
+    query = parse_qs(url_parts.query)
+
+    # caching is done only for "tournament" and "season"
+    if ('game_sportsmanship_scores' in url_parts.path or 'games' in url_parts.path)\
+            and ('tournament_id' in query or 'season_id' in query):
+        if cache.get(url):
+            logger.info('returning cached data ({0} bytes) from URL: {1}'.format(getsizeof(cache.get(url)), url))
+            response_dict = cache.get(url)
+            # check if newer stuff exists
+            query['offset'] = len(response_dict['objects'])
+            next_url_parts = list(url_parts)
+            next_url_parts[4] = urlencode(query, doseq=True)
+            response_dict['meta']['next'] = urlunparse(next_url_parts)
+
+        else:
+            response = session.get(url)
+            logger.info(response.elapsed)
+            response_dict = response.json()
+
+            cache.set(url, response_dict, CACHE_TIME)
+
+        if 'objects' in response_dict:
+            objects = response_dict['objects']
+            while response_dict['meta']['next'] != None:
+                next_url = response_dict['meta']['next']
+                if cache.get(next_url):
+                    response_dict = cache.get(next_url)
+                else:
+                    response = session.get(next_url)
+                    logger.info(response.elapsed)
+                    response_dict = response.json()
+                objects = objects + response_dict['objects']
+            response_dict['objects'] = objects
+            cache.set(url, response_dict, CACHE_TIME)
     else:
         response = session.get(url)
         logger.info(response.elapsed)
         response_dict = response.json()
-        cache.set(url, response_dict, CACHE_TIME)
-
-    if 'objects' in response_dict:
-        objects = response_dict['objects']
-        while response_dict['meta']['next'] != None:
-            next_url = response_dict['meta']['next']
-            if cache.get(next_url):
-                response_dict = cache.get(next_url)
-            else:
+        if 'objects' in response_dict:
+            objects = response_dict['objects']
+            while response_dict['meta']['next'] != None:
+                next_url = response_dict['meta']['next']
                 response = session.get(next_url)
                 logger.info(response.elapsed)
                 response_dict = response.json()
-            objects = objects + response_dict['objects']
-        response_dict['objects'] = objects
-        cache.set(url, response_dict, CACHE_TIME)
+                objects = objects + response_dict['objects']
+            response_dict['objects'] = objects
+
     return response_dict
 
 
@@ -289,17 +320,28 @@ def api_gamesbytournament(tournament_id):
 def api_spiritbyseason(season_id):
     # the most recent score will be reported first, so we can just go through the list
     # and the first score with the right properties we encounter will be the most recent one
-    url = '{0}/v1/game_sportsmanship_scores/?limit=100&season_id={1}&order_by=%5B-time_last_updated%5D'.format(
+    url = '{0}/v1/game_sportsmanship_scores/?limit=100&season_id={1}&order_by=%5Btime_last_updated%5D'.format(
         settings.HOST, season_id)
-    return api_get(url)
+
+    response_dict = api_get(url)
+    # now we have to reverse the object list
+    if 'objects' in response_dict:
+        response_dict['objects'] = list(reversed(response_dict['objects']))
+
+    return response_dict
 
 
 def api_spiritbytournament(tournament_id):
     # the most recent score will be reported first, so we can just go through the list
     # and the first score with the right properties we encounter will be the most recent one
-    url = '{0}/v1/game_sportsmanship_scores/?limit=100&tournament_id={1}&order_by=%5B-time_last_updated%5D'.format(
+    url = '{0}/v1/game_sportsmanship_scores/?limit=100&tournament_id={1}&order_by=%5Btime_last_updated%5D'.format(
         settings.HOST, tournament_id)
-    return api_get(url)
+
+    response_dict = api_get(url)
+    # now we have to reverse the object list
+    if 'objects' in response_dict:
+        response_dict['objects'] = list(reversed(response_dict['objects']))
+    return response_dict
 
 
 def api_spiritbygame(game_id):
@@ -711,7 +753,7 @@ def api_addspirit(access_token, game_id, data_dict):
     response = api_post(access_token, url, data_dict)
     # after adding a new spirit score, all bets about caching are off, we have to clear the cache
     # TODO: be more clever here and only clear affected caches...
-    cache.clear()
+    # cache.clear()
     return response
 
 

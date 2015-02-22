@@ -16,6 +16,8 @@ ALLOWED_DAYS_TO_ENTER = 14
 
 CACHES = memcacheify()
 CACHE_TIME = 60 * 60 * 24 * 5 # 5 days
+CACHE_TIME_VIEWS = 60 * 60    # 1 hour
+
 
 # allows to switch between the real and the testing leaguevine server
 #HOST="http://api.playwithlv.com"
