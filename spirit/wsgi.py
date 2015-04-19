@@ -25,6 +25,10 @@ from dj_static import Cling
 
 application = Cling(get_wsgi_application())
 
+# doing as being told: https://devcenter.heroku.com/articles/memcachier#python
+# Fix django closing connection to MemCachier after every request (#11331)
+from django.core.cache.backends.memcached import BaseMemcachedCache
+BaseMemcachedCache.close = lambda self, **kwargs: None
 
 # Apply WSGI middleware here.
 # from helloworld.wsgi import HelloWorldApplication
