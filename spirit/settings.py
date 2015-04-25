@@ -75,6 +75,23 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
+DEFAULT_FROM_EMAIL = 'info@leaguevine.com'
+SERVER_EMAIL = 'info@leaguevine.com'
+
+EMAIL_HOST = 'smtp.mailgun.org'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+if not ON_HEROKU:
+    EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+    EMAIL_FILE_PATH = '{0}/app-messages'.format(ROOT_PATH)
+#    EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
+elif ON_HEROKU:
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_HOST_USER = os.environ['MAILGUN_USERNAME']
+    EMAIL_HOST_PASSWORD = os.environ['MAILGUN_PASSWORD']
+
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.',  # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
@@ -228,7 +245,7 @@ LOGGING = {
         'mail_admins': {
             'level': 'ERROR',
             'class': 'django.utils.log.AdminEmailHandler'
-        }
+        },
     },
     'loggers': {
         'django.request': {

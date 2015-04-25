@@ -367,8 +367,8 @@ def game(request, game_id):
     # retrieve this game
     game = api_gamebyid(game_id);
 
-    if (u'errors' in game):
-        errmsg = '{0}'.format(game_id)
+    if (u'error_message' in game):
+        errmsg = 'error retrieving game with id {0}: {1}'.format(game_id, game['error_message'])
         return render_to_response('error.html', {'error': errmsg})
 
     user_id = request.session.get('user_id', None)
@@ -409,8 +409,8 @@ def game_submit(request, game_id, team_idx_giving):
     # retrieve this game
     game = api_gamebyid(game_id);
 
-    if (u'errors' in game):
-        errmsg = '{0}'.format(game_id)
+    if (u'error_message' in game):
+        errmsg = 'error retrieving game with id {0}: {1}'.format(game_id, game['error_message'])
         return render_to_response('error.html', {'error': errmsg})
 
     user_id = request.session.get('user_id', None)
