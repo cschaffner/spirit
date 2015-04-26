@@ -320,7 +320,7 @@ def api_gamesbytournament(tournament_id):
 def api_spiritbyseason(season_id):
     # the most recent score will be reported first, so we can just go through the list
     # and the first score with the right properties we encounter will be the most recent one
-    url = '{0}/v1/game_sportsmanship_scores/?limit=100&season_id={1}&order_by=%5Btime_last_updated%5D'.format(
+    url = '{0}/v1/game_sportsmanship_scores/?limit=150&season_id={1}&order_by=%5Btime_last_updated%5D'.format(
         settings.HOST, season_id)
 
     response_dict = api_get(url)
@@ -334,7 +334,7 @@ def api_spiritbyseason(season_id):
 def api_spiritbytournament(tournament_id):
     # the most recent score will be reported first, so we can just go through the list
     # and the first score with the right properties we encounter will be the most recent one
-    url = '{0}/v1/game_sportsmanship_scores/?limit=100&tournament_id={1}&order_by=%5Btime_last_updated%5D'.format(
+    url = '{0}/v1/game_sportsmanship_scores/?limit=150&tournament_id={1}&order_by=%5Btime_last_updated%5D'.format(
         settings.HOST, tournament_id)
 
     response_dict = api_get(url)
@@ -348,10 +348,10 @@ def api_spiritbygame(game_id):
     # the most recent score will be reported first, so we can just go through the list
     # and the first score with the right properties we encounter will be the most recent one
     if type(game_id) is unicode or type(game_id) is int:
-        url = '{0}/v1/game_sportsmanship_scores/?limit=100&game_ids=%5B{1}%5D&order_by=%5B-time_last_updated%5D'.format(
+        url = '{0}/v1/game_sportsmanship_scores/?limit=200&game_ids=%5B{1}%5D&order_by=%5B-time_last_updated%5D'.format(
             settings.HOST, game_id)
     elif type(game_id) is list:
-        url = '{0}/v1/game_sportsmanship_scores/?limit=100&game_ids={1}&order_by=%5B-time_last_updated%5D'.format(
+        url = '{0}/v1/game_sportsmanship_scores/?limit=200&game_ids={1}&order_by=%5B-time_last_updated%5D'.format(
             settings.HOST, game_id)
     else:
         raise ('a game-id should be provided!')

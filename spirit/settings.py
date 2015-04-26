@@ -75,8 +75,8 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
-DEFAULT_FROM_EMAIL = 'info@leaguevine.com'
-SERVER_EMAIL = 'info@leaguevine.com'
+DEFAULT_FROM_EMAIL = 'info@spirit.leaguevine.com'
+SERVER_EMAIL = 'info@spirit.leaguevine.com'
 
 EMAIL_HOST = 'smtp.mailgun.org'
 EMAIL_PORT = 587
