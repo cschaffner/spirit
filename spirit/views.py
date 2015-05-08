@@ -275,13 +275,16 @@ def score_string(my_score, opp_score):
 
 def season(request, season_id):
     info = api_seasonbyid(season_id)
+    if (u'error_message' in info):
+        errmsg = 'error retrieving season with id {0} from leaguevine: {1}'.format(season_id, info['error_message'])
+        return render_to_response('error.html', {'error': errmsg})
     # retrieve all games of this season
     spirit = api_spiritbyseason(season_id)
     games = api_gamesbyseason_restricted(season_id)
 
     # logger.info(pformat(spirit))
 
-    if (u'errors' in spirit):
+    if (u'error_message' in spirit):
         errmsg = '{0}'.format(spirit['errors'])
         return render_to_response('error.html', {'error': errmsg})
 
@@ -307,12 +310,16 @@ def season(request, season_id):
 
 def tournament(request, tournament_id):
     info = api_tournamentbyid(tournament_id)
+    if (u'error_message' in info):
+        errmsg = 'error retrieving tournament with id {0} from leaguevine: {1}'.format(tournament_id, info['error_message'])
+        return render_to_response('error.html', {'error': errmsg})
+
     info[u'start_datetime'] = parse_date(info['start_date'])
     info[u'end_datetime'] = parse_date(info['end_date'])
     # retrieve all games of this tournament
     spirit = api_spiritbytournament(tournament_id)
     games = api_gamesbytournament(tournament_id)
-    if (u'errors' in spirit):
+    if (u'error_message' in spirit):
         errmsg = '{0}'.format(spirit['errors'])
         return render_to_response('error.html', {'error': errmsg})
 
@@ -368,7 +375,7 @@ def game(request, game_id):
     game = api_gamebyid(game_id);
 
     if (u'error_message' in game):
-        errmsg = 'error retrieving game with id {0}: {1}'.format(game_id, game['error_message'])
+        errmsg = 'error retrieving game with id {0} from leaguevine: {1}'.format(game_id, game['error_message'])
         return render_to_response('error.html', {'error': errmsg})
 
     user_id = request.session.get('user_id', None)
