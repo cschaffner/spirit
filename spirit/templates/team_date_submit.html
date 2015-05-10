@@ -17,6 +17,11 @@
 
       <h2><a href="/teams/{{ team.id }}/" class="label label-primary">{{team.name}}</a></h2>
       <br />
+     <div class="alert alert-info">
+         Click <a href="http://wfdf.net/about/meeting-minutes/doc_download/507-examples-sotg-scoring-system-2014-en" target="_blank">
+         here for a PDF with detailed WFDF examples</a>.
+     </div>
+
         <form method="post" action="/teams/{{ team.id }}/{{ year }}-{{ month }}-{{ day }}/">
             {% csrf_token %}
             <div class="row">

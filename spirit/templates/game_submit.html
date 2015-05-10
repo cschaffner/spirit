@@ -20,6 +20,10 @@
       <h2><a href="/teams/{{ team_giving.id }}/" class="label label-primary">{{team_giving.name}}</a> gives
           <a href="/teams/{{ team_receiving.id }}/" class="label label-info">{{team_receiving.name}}</a></h2>
       <br />
+     <div class="alert alert-info">
+         Click <a href="http://wfdf.net/about/meeting-minutes/doc_download/507-examples-sotg-scoring-system-2014-en" target="_blank">
+         here for a PDF with detailed WFDF examples</a>.
+     </div>
       <form action="/games/{{game.id}}/submit/{{team_idx_giving}}/" method="post">{% csrf_token %}
             {% csrf_token %}
             <div class="row">
