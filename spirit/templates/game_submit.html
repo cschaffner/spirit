@@ -88,17 +88,25 @@
     o.removeClass('radio').addClass('radio-new');
     var input = o.find('input');
     var a = $("<a class='ar' href='#'>" + input.val() + "</a>");
+    var span = o.parent().find('span.ex'+ input.val());
+    span.hide(); // hide this particular span
 
-    if(input.prop('checked')) {
+    if(input.prop('checked')) { // activate only the checked ones
       a.addClass('active');
+      span.show();
     }
     a.click(function(e){
       e.preventDefault();
       var parent = o.parent();
       parent.find('input').prop('checked', false);
       parent.find('a').removeClass('active');
+      parent.find('span').hide(); // hides *all* spans
+
       input.prop('checked', true);
       a.addClass('active');
+      var span = parent.find('span.ex'+ input.val());
+      span.show(); // shows the one that is active
+
       updateScores();
     });
 
