@@ -19,7 +19,7 @@
       <br />
      <div class="alert alert-info">
          Click <a href="http://wfdf.net/about/meeting-minutes/doc_download/507-examples-sotg-scoring-system-2014-en" target="_blank">
-         here for a PDF with detailed WFDF examples</a>.
+         here for a PDF</a> with detailed WFDF examples or check them below when selecting the scores.
      </div>
 
         <form method="post" action="/teams/{{ team.id }}/{{ year }}-{{ month }}-{{ day }}/">
@@ -96,17 +96,23 @@
     o.removeClass('radio').addClass('radio-new');
     var input = o.find('input');
     var a = $("<a class='ar' href='#'>" + input.val() + "</a>");
+    var span = o.parent().find('span.ex'+ input.val());
+    span.hide(); // hide this particular span
 
     if(input.prop('checked')) {
       a.addClass('active');
+      span.show();
     }
     a.click(function(e){
       e.preventDefault();
       var parent = o.parent();
       parent.find('input').prop('checked', false);
       parent.find('a').removeClass('active');
+      parent.find('span').hide(); // hides *all* spans
+
       input.prop('checked', true);
       a.addClass('active');
+      parent.find('span.ex'+ input.val()).show(); // shows the one that is active
       updateScores();
     });
 

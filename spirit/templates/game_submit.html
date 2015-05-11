@@ -22,7 +22,7 @@
       <br />
      <div class="alert alert-info">
          Click <a href="http://wfdf.net/about/meeting-minutes/doc_download/507-examples-sotg-scoring-system-2014-en" target="_blank">
-         here for a PDF with detailed WFDF examples</a>.
+         here for a PDF</a> with detailed WFDF examples or check them below when selecting the scores.
      </div>
       <form action="/games/{{game.id}}/submit/{{team_idx_giving}}/" method="post">{% csrf_token %}
             {% csrf_token %}
@@ -104,8 +104,7 @@
 
       input.prop('checked', true);
       a.addClass('active');
-      var span = parent.find('span.ex'+ input.val());
-      span.show(); // shows the one that is active
+      parent.find('span.ex'+ input.val()).show(); // shows the one that is active
 
       updateScores();
     });
