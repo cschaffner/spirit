@@ -14,11 +14,6 @@ ALLOWED_DAYS_TO_ENTER = 14
 # except ImportError, e:
 #     pass
 
-CACHES = memcacheify()
-CACHE_TIME = 60 * 60 * 24 * 5 # 5 days
-CACHE_TIME_VIEWS = 60 * 60    # 1 hour
-
-
 # allows to switch between the real and the testing leaguevine server
 #HOST="http://api.playwithlv.com"
 HOST="https://api.leaguevine.com"
@@ -54,6 +49,16 @@ else:
     CLIENT_PWD = '6bbbd86bef4b4359d3298ce9112f56'
     REDIRECT_URI = 'http://127.0.0.1:8000/code/'
     # REDIRECT_URI = 'http://10.10.255.179:8000/code/'
+
+
+
+CACHES = memcacheify()
+CACHE_TIME = 60 * 60 * 24 * 5 # 5 days
+CACHE_TIME_VIEWS = 60 * 60    # 1 hour\
+
+if not ON_HEROKU:
+    CACHE_TIME_VIEWS = 0    # no view caching locally
+
 
 
 if HOST == "http://api.playwithlv.com":

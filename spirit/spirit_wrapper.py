@@ -79,7 +79,10 @@ def api_get(url):
             logger.info(response.elapsed)
             response_dict = response.json()
 
-            cache.set(url, response_dict, CACHE_TIME)
+            # do not cache responses with errors,
+            # i.e. always re-do those requests (problems might have been fixed by now)
+            if (u'error_message') not in response_dict:
+                cache.set(url, response_dict, CACHE_TIME)
 
         if 'objects' in response_dict:
             objects = response_dict['objects']

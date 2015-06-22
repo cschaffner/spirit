@@ -285,7 +285,7 @@ def season(request, season_id):
     # logger.info(pformat(spirit))
 
     if (u'error_message' in spirit):
-        errmsg = '{0}'.format(spirit['errors'])
+        errmsg = '{0}'.format(spirit['error_message'])
         return render_to_response('error.html', {'error': errmsg})
 
     # remove BYE games, as those are irrelevant for spirit scores:
@@ -320,7 +320,7 @@ def tournament(request, tournament_id):
     spirit = api_spiritbytournament(tournament_id)
     games = api_gamesbytournament(tournament_id)
     if (u'error_message' in spirit):
-        errmsg = '{0}'.format(spirit['errors'])
+        errmsg = '{0}'.format(spirit['error_message'])
         return render_to_response('error.html', {'error': errmsg})
 
     # remove BYE games, as those are irrelevant for spirit scores:
@@ -351,8 +351,8 @@ def result(request, tournament_id):
     # remove BYE games, as those are irrelevant for spirit scores:
     games['objects'] = [g for g in games['objects'] if g['team_2_id']]
 
-    if (u'errors' in spirit):
-        errmsg = '{0}'.format(spirit['errors'])
+    if (u'error_message' in spirit):
+        errmsg = '{0}'.format(spirit['error_message'])
         return render_to_response('error.html', {'error': errmsg})
 
     user_id = request.session.get('user_id', None)
