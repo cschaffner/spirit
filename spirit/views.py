@@ -396,6 +396,10 @@ def game(request, game_id):
     #                break
 
     spirit = api_spiritbygame(game_id)
+    if (u'error_message' in spirit):
+        errmsg = 'error retrieving spirit score for game with id {0} from leaguevine: {1}'.format(game_id, spirit['error_message'])
+        return render_to_response('error.html', {'error': errmsg})
+
     for s in spirit['objects']:
         # list is sorted according to time_last_updated
         # so we can simply go through the list and take the first score that matches
