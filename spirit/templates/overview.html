@@ -43,7 +43,7 @@
 <table id="table-games" class="table tablesorter">
 	<thead>
 	<tr>
-        <th>Date</th>
+        <th class="{sorter: 'date'}">Date</th>
         <th>Field</th>
         <th>Team 1</th>
         <th>Score</th>
@@ -84,8 +84,8 @@
   <script type="text/javascript" src="/static/jscript/jquery.tablesorter.js"></script>
   <script type="text/javascript">
     $(function() {
-		  $("#table-teams").tablesorter( {sortList: [[0,0], [1,0]]} );
-		  $("#table-games").tablesorter( {sortList: [[0,0], [1,0]]} );
+		  $("#table-teams").tablesorter( {sortList: [[2,1], [6,0]]} );
+		  $("#table-games").tablesorter( {sortList: [[0,1]]} );
     });
   </script>
 {% endblock %}
