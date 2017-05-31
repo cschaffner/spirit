@@ -19,7 +19,7 @@ ALLOWED_DAYS_TO_ENTER = 14
 HOST="https://api.leaguevine.com"
 # HOST = "http://api.localhost:8000"
 
-ALLOWED_HOSTS = ['spiritapp.herokuapp.com', 'spirit.leaguevine.com']
+ALLOWED_HOSTS = ['spiritapp.herokuapp.com', 'spirit.leaguevine.com', '127.0.0.1']
 
 
 # expects credentials to be stored in environmental variables!
@@ -195,6 +195,7 @@ ROOT_URLCONF = 'spirit.urls'
 WSGI_APPLICATION = 'spirit.wsgi.application'
 
 TEMPLATE_DIRS = (
+    '~/Sites/spirit/spirit/templates',
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
@@ -240,7 +241,7 @@ LOGGING = {
     'handlers': {
         'null': {
             'level': 'DEBUG',
-            'class': 'django.utils.log.NullHandler',
+            'class': 'logging.NullHandler',
         },
         'console': {
             'level': 'DEBUG',
