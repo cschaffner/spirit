@@ -20,4 +20,4 @@ requests==2.17.3
 six==1.10.0
 static==1.1.1
 static3==0.5.1
-urllib3==1.21.1
+urllib3==1.26.5
